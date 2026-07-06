@@ -1,0 +1,18 @@
+
+
+
+model Payment {
+  id              String          @id @default(uuid())
+  bookingId       String          @unique @db.Uuid
+  booking         Booking         @relation(fields: [bookingId], references: [id])
+
+  transactionId   String          @unique
+  paymentIntentId String          @unique
+  amount          Int
+  status          PaymentStatus
+  paidAt          DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@map("payments")
+}
