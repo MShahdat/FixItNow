@@ -70,11 +70,11 @@ export const badResponse = (res: Response, message: string) => {
 }
 
 
-export const errorResponse = <T> (res: Response, message: string, data?: T) => {
+export const errorResponse = <T> (res: Response, message?: string, data?: T) => {
   const response = {
     success: false,
     statusCode: httpCode.INTERNAL_SERVER_ERROR,
-    message,
+    message: message || "Internal server error!",
     data
   }
   res.status(httpCode.INTERNAL_SERVER_ERROR).json(response)

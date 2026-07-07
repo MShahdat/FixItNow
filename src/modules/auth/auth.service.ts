@@ -53,8 +53,8 @@ const userRegisterIntoDB = async (payload: IUserRegister) => {
       const createdUser = await tx.user.create({
         data: userData,
         omit: {
-          password: true
-        }
+          password: true,
+        },
       })
 
       if (payload.role === "TECHNICIAN") {
@@ -65,7 +65,20 @@ const userRegisterIntoDB = async (payload: IUserRegister) => {
           }
         })
       }
-      return createdUser
+
+      const user = await tx.user.findUnique({
+        where: { email },
+        omit: {
+          password: true,
+          createdAt: true,
+          updatedAt: true
+        },
+        include: {
+          technicianProfile: true
+        }
+      })
+
+      return user
     },
     {
       maxWait: 50000,
@@ -177,10 +190,29 @@ const generateAccessToken = async (token: string) => {
 
 
 
+//& GET ME
+const getMeFromDB = async (id: string) => {
+
+  const result = await prisma.user.findUnique({
+    where: {id},
+    omit: {
+      password: true,
+      createdAt: true,
+      updatedAt: true
+    },
+    include: {
+      technicianProfile: true
+    }
+  })
+
+  return result
+}
+
 
 export const authService = {
   userRegisterIntoDB,
   userLoginFromDB,
   generateAccessToken,
+  getMeFromDB,
 
 }

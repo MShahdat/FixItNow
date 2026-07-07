@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import catchAsync from "../../utility/catchAsync";
 import { authService } from "./auth.service";
-import { badResponse, notFoundResponse, successResponse, unauthorizedResponse } from "../../utility/sendResponse";
+import { badResponse, errorResponse, notFoundResponse, successResponse, unauthorizedResponse } from "../../utility/sendResponse";
 import httpCode from 'http-status'
 
 //& USER REGISTER
@@ -11,6 +11,7 @@ const userRegister = catchAsync(
     console.log("body", body)
 
     const result = await authService.userRegisterIntoDB(body);
+    console.log('user  ', result)
 
     return successResponse(res, httpCode.CREATED, 'User register successfully', result)
   }
@@ -53,15 +54,15 @@ const userLogin = catchAsync(
 //& GENERATE ACCESS TOKEN
 const generateAccessToken = catchAsync(async (req: Request, res: Response) => {
   // console.log('cookies : ', req.cookies.refreshToken)
-  
+
   const token = req.cookies.refreshToken;
 
   const result = await authService.generateAccessToken(token)
 
-  if(result === 'unauthorized'){
+  if (result === 'unauthorized') {
     return unauthorizedResponse(res, 'unauthorized access')
   }
-  
+
   res.cookie('accessToken', result, {
     secure: false,
     httpOnly: true,
@@ -77,11 +78,24 @@ const generateAccessToken = catchAsync(async (req: Request, res: Response) => {
 })
 
 
+//& GET ME
+const getMe = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = req.user?.id as string
 
+    const result = await authService.getMeFromDB(id);
+
+    if(!result){
+      return errorResponse(res, "Internal server error")
+    }
+    return successResponse(res, httpCode.OK, 'user retrive successfully', result)
+  }
+)
 
 export const authController = {
   userRegister,
   userLogin,
   generateAccessToken,
+  getMe,
 
 }
