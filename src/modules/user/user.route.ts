@@ -1,5 +1,17 @@
 
 import { Router } from "express"
+import { userController } from "./user.controller"
+import { authorization } from "../../middleware/auth"
+import { Role } from "../../../generated/prisma/enums"
 
 
-const router = Router()
+const route = Router()
+
+route.get('/profile', authorization.roleAuth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN), userController.getProfile)
+route.put('/profile', authorization.roleAuth(Role.CUSTOMER, Role.TECHNICIAN), userController.updateProfile)
+route.patch('/change-password', authorization.roleAuth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN), userController.updatePass)
+
+
+
+
+export const userRouter = route

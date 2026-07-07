@@ -83,11 +83,15 @@ const generateAccessToken = catchAsync(async (req: Request, res: Response) => {
 //& GET ME
 const getMe = catchAsync(
   async (req: Request, res: Response) => {
+    if (!req.user) {
+      return notFoundResponse(res, 'User not found!!')
+    }
+
     const id = req.user?.id as string
+    const role = req.user.role
+    const result = await authService.getMeFromDB(role, id);
 
-    const result = await authService.getMeFromDB(id);
-
-    if(!result){
+    if (!result) {
       return errorResponse(res, "Internal server error")
     }
     return successResponse(res, httpCode.OK, 'user retrive successfully', result)

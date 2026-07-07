@@ -1,6 +1,6 @@
 import config from "../../config/env";
 import { prisma } from "../../lib/prisma";
-import { Prisma } from "../../../generated/prisma/client";
+import { Prisma, Role } from "../../../generated/prisma/client";
 import { IUserLogin, IUserRegister } from "./auth.interface"
 import bcrypt from 'bcrypt'
 import { JwtPayload, SignOptions } from "jsonwebtoken";
@@ -191,20 +191,24 @@ const generateAccessToken = async (token: string) => {
 
 
 //& GET ME
-const getMeFromDB = async (id: string) => {
+const getMeFromDB = async (role: Role, id: string) => {
 
-  const result = await prisma.user.findUnique({
-    where: {id},
+  const query: Prisma.UserFindUniqueArgs = {
+    where: { id },
     omit: {
       password: true,
       createdAt: true,
-      updatedAt: true
+      updatedAt: true,
     },
-    include: {
-      technicianProfile: true
-    }
-  })
+  };
 
+  if (role === "TECHNICIAN") {
+    query.include = {
+      technicianProfile: true,
+    };
+  }
+
+  const result = await prisma.user.findUnique(query);
   return result
 }
 
