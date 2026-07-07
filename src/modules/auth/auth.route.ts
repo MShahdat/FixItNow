@@ -9,7 +9,7 @@ const router = Router();
 
 router.post('/register', validateData(registerSchema), authController.userRegister);
 router.post('/login', authController.userLogin) 
-router.post('/access-token', authorization.roleAuth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN) , authController.generateAccessToken)
+router.post('/access-token', authController.generateAccessToken)
 router.get('/me', authorization.roleAuth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN), authController.getMe)
 
 export const authRouter = router;

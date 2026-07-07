@@ -1,6 +1,5 @@
-import { profile } from 'node:console';
+
 import { z } from 'zod';
-import { Prisma } from '../../../generated/prisma/client';
 
 
 const baseSchema = z.object({
@@ -25,8 +24,8 @@ const technicianSchema = baseSchema.extend({
     
     bio: z.string().optional(),
     skills: z.array(z.string()),
-    experience: z.string().optional(),
-    hourlyRate: z.number().positive().transform((val) => new Prisma.Decimal(val)),
+    experience: z.number().optional(),
+    hourlyRate: z.number(),
     availability: z.array(z.string()),
 });
 

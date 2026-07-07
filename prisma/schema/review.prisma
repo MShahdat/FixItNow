@@ -17,6 +17,9 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([bookingId])
+  @@index([customerId])
+  @@index([technicianId])
 
   @@map("reviews")
 }

@@ -14,7 +14,7 @@ export interface IUserRegister {
     status?: UserStatus
     bio?: string;
     skills?: string[];
-    experience?: string;
+    experience?: number | null;
     hourlyRate?: number
     averageRating?: number;
     completedJobs?: number;

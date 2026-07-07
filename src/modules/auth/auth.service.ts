@@ -38,12 +38,12 @@ const userRegisterIntoDB = async (payload: IUserRegister) => {
 
   const technicianData = {
     bio: payload.bio ?? null,
-    skills: Array.isArray(payload.skills) ? payload.skills : [],
-    experience: payload.experience ?? null,
+    skills: payload.skills ?? [],
+    experience: payload.experience !== undefined ? Number(payload.experience) : null,
     hourlyRate: payload.hourlyRate !== undefined
       ? new Prisma.Decimal(payload.hourlyRate)
       : new Prisma.Decimal(0),
-    availability: Array.isArray(payload.availability) ? payload.availability : [],
+    availability: payload.availability ?? [],
     isVerified: payload.verified ?? false,
     isAvailable: payload.isAvailable ?? true,
   }

@@ -6,16 +6,19 @@ model Payment {
   
   bookingId       String          @unique
   booking         Booking         @relation(fields: [bookingId], references: [id])
-  userId        String   @unique
+  userId        String
   user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   transactionId   String          @unique
   paymentIntentId String          @unique
-  amount          Int
+  amount          Decimal         @db.Decimal(10, 2)
   status          PaymentStatus
-  paidAt          DateTime?
+  paidAt          DateTime
 
   createdAt DateTime @default(now())
+  
+  @@index([bookingId])
+  @@index([userId])
 
   @@map("payments")
 }

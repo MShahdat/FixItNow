@@ -56,8 +56,10 @@ const generateAccessToken = catchAsync(async (req: Request, res: Response) => {
   // console.log('cookies : ', req.cookies.refreshToken)
 
   const token = req.cookies.refreshToken;
+  console.log('ok')
 
   const result = await authService.generateAccessToken(token)
+  console.log('result === ', result)
 
   if (result === 'unauthorized') {
     return unauthorizedResponse(res, 'unauthorized access')
