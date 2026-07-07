@@ -3,14 +3,14 @@
 
 model Booking {
   id           String            @id @default(uuid())
+
   customerId   String
   customer     User              @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  technicianId String            @db.Uuid
+  technicianId String         
   technician   TechnicianProfile @relation(fields: [technicianId], references: [id], onDelete: Cascade)
   serviceId String  
-  service   Services @relation(fields: [serviceId], references: [id])
+  service   Services @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
-  bookingDate DateTime
   servicingDate DateTime
   address String
   price Int

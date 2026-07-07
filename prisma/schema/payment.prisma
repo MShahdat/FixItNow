@@ -3,7 +3,8 @@
 
 model Payment {
   id              String          @id @default(uuid())
-  bookingId       String          @unique @db.Uuid
+  
+  bookingId       String          @unique
   booking         Booking         @relation(fields: [bookingId], references: [id])
 
   transactionId   String          @unique
