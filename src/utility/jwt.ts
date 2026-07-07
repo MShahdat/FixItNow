@@ -11,7 +11,6 @@ const createToken = (
 
 
 const jwtVerify = (token: string, secret: string) => {
-
   const tokenVerify = jwt.verify(token, secret)
 
   if (typeof tokenVerify === 'string') {

@@ -5,7 +5,7 @@ import { IUserLogin, IUserRegister } from "./auth.interface"
 import bcrypt from 'bcrypt'
 import { JwtPayload, SignOptions } from "jsonwebtoken";
 import { jwtToken } from "../../utility/jwt";
-
+import jwt from "jsonwebtoken";
 
 //& USER REGISTER
 const userRegisterIntoDB = async (payload: IUserRegister) => {
@@ -57,7 +57,7 @@ const userRegisterIntoDB = async (payload: IUserRegister) => {
         }
       })
 
-      if(payload.role === "TECHNICIAN") {
+      if (payload.role === "TECHNICIAN") {
         await tx.technicianProfile.create({
           data: {
             ...technicianData,
@@ -79,11 +79,11 @@ const userRegisterIntoDB = async (payload: IUserRegister) => {
 
 
 //& USER LOGIN
-const userLoginFromDB = async(payload: IUserLogin) => {
-  
+const userLoginFromDB = async (payload: IUserLogin) => {
+
   const { email, password } = payload
   console.log('payload ', payload)
-  
+
   const user = await prisma.user.findUnique({
     where: { email }
   })
@@ -132,8 +132,55 @@ const userLoginFromDB = async(payload: IUserLogin) => {
   return result
 }
 
+
+
+//& GENERATE REFRESH TOKEN
+const generateAccessToken = async (token: string) => {
+
+  if (!token) {
+    return 'unauthorized'
+  }
+
+  // decode user based on token
+  const decoded = jwt.verify(
+    token,
+    config.jwt_refresh_secret as string
+  ) as JwtPayload
+
+  const { id } = decoded
+  // console.log('decoded', decoded)
+
+  const isUser = await prisma.user.findUnique({
+    where: { id }
+  })
+
+
+  const jwtPayload = {
+    id: isUser?.id,
+    firstName: isUser?.firstName,
+    lastName: isUser?.lastName,
+    role: isUser?.role,
+    phone: isUser?.phone,
+    status: isUser?.status
+  } as JwtPayload
+  // console.log(jwtPayload)
+
+  const accessToken = jwtToken.createToken(
+    jwtPayload, 
+    config.jwt_access_sectet, 
+    config.jwt_access_expires_in as SignOptions['expiresIn']
+  )
+  // console.log('access token: ', accessToken)
+
+  return accessToken;
+}
+
+
+
+
 export const authService = {
   userRegisterIntoDB,
   userLoginFromDB,
+  generateAccessToken,
 
 }

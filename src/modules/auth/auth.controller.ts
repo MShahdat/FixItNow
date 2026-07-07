@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import catchAsync from "../../utility/catchAsync";
 import { authService } from "./auth.service";
-
+import { badResponse, notFoundResponse, successResponse, unauthorizedResponse } from "../../utility/sendResponse";
+import httpCode from 'http-status'
 
 //& USER REGISTER
 const userRegister = catchAsync(
@@ -11,11 +12,7 @@ const userRegister = catchAsync(
 
     const result = await authService.userRegisterIntoDB(body);
 
-    return res.status(200).json({
-      status: "success",
-      message: "User registered successfully",
-      data: result
-    })
+    return successResponse(res, httpCode.CREATED, 'User register successfully', result)
   }
 )
 
@@ -24,27 +21,67 @@ const userRegister = catchAsync(
 const userLogin = catchAsync(
   async (req: Request, res: Response) => {
     const body = req.body
-    console.log('body ', body)
-    
+
     const result = await authService.userLoginFromDB(body)
-    console.log('result ', result)
 
-    if(!result){
-      console.log('user not found')
-      return
+    if (!result) {
+      return notFoundResponse(res, 'user not found!!')
     }
-    if(result === 'invalid'){
-      console.log('pass or email incorrect ')
-      return
+    if (result === 'invalid') {
+      return badResponse(res, 'invalid email or password')
     }
 
-    console.log('user loged in successfully')
-    return
+    res.cookie('refreshToken', result.refreshToken, {
+      secure: false,    // set ture in production
+      httpOnly: true,
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 24 * 7   // 7 days
+    })
+
+    res.cookie('accessToken', result.accessToken, {
+      secure: false,
+      httpOnly: true,
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 1   // 1 hour
+    })
+
+    successResponse(res, httpCode.OK, 'user loged in successfully', result)
   }
 )
+
+
+//& GENERATE ACCESS TOKEN
+const generateAccessToken = catchAsync(async (req: Request, res: Response) => {
+  // console.log('cookies : ', req.cookies.refreshToken)
+  
+  const token = req.cookies.refreshToken;
+
+  const result = await authService.generateAccessToken(token)
+
+  if(result === 'unauthorized'){
+    return unauthorizedResponse(res, 'unauthorized access')
+  }
+  
+  res.cookie('accessToken', result, {
+    secure: false,
+    httpOnly: true,
+    sameSite: "none",
+    maxAge: 1000 * 60 * 60 * 1  // for 1 hour
+  })
+
+  const rs = {
+    accessToken: result
+  }
+
+  return successResponse(res, httpCode.CREATED, 'Access token crated successfully', rs)
+})
+
+
+
 
 export const authController = {
   userRegister,
   userLogin,
+  generateAccessToken,
 
 }
