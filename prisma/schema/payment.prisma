@@ -6,6 +6,8 @@ model Payment {
   
   bookingId       String          @unique
   booking         Booking         @relation(fields: [bookingId], references: [id])
+  userId        String   @unique
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   transactionId   String          @unique
   paymentIntentId String          @unique

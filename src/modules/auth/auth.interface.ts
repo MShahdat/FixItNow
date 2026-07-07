@@ -7,13 +7,24 @@ export interface IUserRegister {
     email: string;
     password: string;
     phone: string;
+    profileImage?: string;
     address?: string;
     city?: string;
     role: Role
     status?: UserStatus
     bio?: string;
+    skills?: string[];
     experience?: string;
-    workingHours?: string[];
-    availability?: boolean;
+    hourlyRate?: number
+    averageRating?: number;
+    completedJobs?: number;
+    isAvailable?: boolean;
+    availability?: string[];
     verified?: boolean;
+}
+
+
+export interface IUserLogin {
+    email: string
+    password: string
 }

@@ -8,6 +8,7 @@ model User {
   email      String   @unique
   password   String
   phone      String   @unique
+  profileImage String?
   address    String?
   city       String?
 
@@ -21,6 +22,7 @@ model User {
   technicianProfile TechnicianProfile?
   customerBookings Booking[]
   reviews Review[]
+  payments Payment[]
   
   @@map("users")
 }

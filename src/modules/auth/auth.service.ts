@@ -1,7 +1,10 @@
 import config from "../../config/env";
 import { prisma } from "../../lib/prisma";
-import { IUserRegister } from "./auth.interface"
+import { Prisma } from "../../../generated/prisma/client";
+import { IUserLogin, IUserRegister } from "./auth.interface"
 import bcrypt from 'bcrypt'
+import { JwtPayload, SignOptions } from "jsonwebtoken";
+import { jwtToken } from "../../utility/jwt";
 
 
 //& USER REGISTER
@@ -35,10 +38,14 @@ const userRegisterIntoDB = async (payload: IUserRegister) => {
 
   const technicianData = {
     bio: payload.bio ?? null,
+    skills: Array.isArray(payload.skills) ? payload.skills : [],
     experience: payload.experience ?? null,
-    workingHours: payload.workingHours ?? [],
-    availability: payload.availability ?? true,
-    verified: payload.verified ?? false
+    hourlyRate: payload.hourlyRate !== undefined
+      ? new Prisma.Decimal(payload.hourlyRate)
+      : new Prisma.Decimal(0),
+    availability: Array.isArray(payload.availability) ? payload.availability : [],
+    isVerified: payload.verified ?? false,
+    isAvailable: payload.isAvailable ?? true,
   }
 
   const transectionResult = await prisma.$transaction(
@@ -70,7 +77,63 @@ const userRegisterIntoDB = async (payload: IUserRegister) => {
 }
 
 
+
+//& USER LOGIN
+const userLoginFromDB = async(payload: IUserLogin) => {
+  
+  const { email, password } = payload
+  console.log('payload ', payload)
+  
+  const user = await prisma.user.findUnique({
+    where: { email }
+  })
+
+  if (!user) {
+    return null
+  }
+
+  const pass = user.password
+  const isMatch = await bcrypt.compare(password, pass)
+
+  if (!isMatch) {
+    return 'invalid'
+  }
+
+  //& JWT TOKEN GENERATE
+  const { id, firstName, lastName, role, phone, status } = user
+
+  const jwtPayload = {
+    id,
+    firstName,
+    lastName,
+    role,
+    phone,
+    status
+  } as JwtPayload
+
+  console.log('jwt payload ', jwtPayload)
+
+  const accessToken = jwtToken.createToken(
+    jwtPayload,
+    config.jwt_access_sectet,
+    config.jwt_access_expires_in as SignOptions['expiresIn'],
+  )
+
+  const refreshToken = jwtToken.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in as SignOptions['expiresIn'],
+  )
+
+  const result = {
+    accessToken: accessToken,
+    refreshToken: refreshToken
+  }
+  return result
+}
+
 export const authService = {
   userRegisterIntoDB,
+  userLoginFromDB,
 
 }

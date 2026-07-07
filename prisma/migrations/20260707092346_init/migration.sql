@@ -16,10 +16,16 @@ CREATE TABLE "bookings" (
     "customerId" TEXT NOT NULL,
     "technicianId" TEXT NOT NULL,
     "serviceId" TEXT NOT NULL,
-    "servicingDate" TIMESTAMP(3) NOT NULL,
+    "scheduledDate" TIMESTAMP(3) NOT NULL,
     "address" TEXT NOT NULL,
-    "price" INTEGER NOT NULL,
+    "note" TEXT,
+    "totalAmount" DECIMAL(10,2) NOT NULL,
     "status" "BookingStatus" NOT NULL,
+    "cancelReason" TEXT,
+    "acceptedAt" TIMESTAMP(3),
+    "startedAt" TIMESTAMP(3),
+    "completedAt" TIMESTAMP(3),
+    "canceledAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -30,6 +36,7 @@ CREATE TABLE "bookings" (
 CREATE TABLE "categories" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "icon" TEXT,
     "description" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -41,6 +48,7 @@ CREATE TABLE "categories" (
 CREATE TABLE "payments" (
     "id" TEXT NOT NULL,
     "bookingId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "transactionId" TEXT NOT NULL,
     "paymentIntentId" TEXT NOT NULL,
     "amount" INTEGER NOT NULL,
@@ -56,8 +64,9 @@ CREATE TABLE "reviews" (
     "id" TEXT NOT NULL,
     "bookingId" TEXT NOT NULL,
     "customerId" TEXT NOT NULL,
-    "rating" INTEGER NOT NULL,
-    "comment" TEXT NOT NULL,
+    "technicianId" TEXT NOT NULL,
+    "rating" DECIMAL(2,1) NOT NULL,
+    "comment" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -71,9 +80,10 @@ CREATE TABLE "services" (
     "categoryId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "price" INTEGER NOT NULL,
+    "price" DECIMAL(10,2) NOT NULL,
     "duration" TEXT NOT NULL,
     "availableAt" TEXT[],
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -85,10 +95,14 @@ CREATE TABLE "technician_profiles" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "bio" TEXT,
+    "skills" TEXT[],
     "experience" TEXT,
-    "workingHours" TEXT[],
-    "availability" BOOLEAN NOT NULL DEFAULT true,
-    "verified" BOOLEAN NOT NULL DEFAULT false,
+    "hourlyRate" DECIMAL(10,2),
+    "avgRating" DECIMAL(65,30) DEFAULT 0.0,
+    "compoletedJobs" INTEGER DEFAULT 0,
+    "isAvailable" BOOLEAN NOT NULL DEFAULT true,
+    "availability" TEXT[],
+    "isVerified" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -103,6 +117,7 @@ CREATE TABLE "users" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
+    "profileImage" TEXT,
     "address" TEXT,
     "city" TEXT,
     "role" "Role" NOT NULL,
@@ -118,6 +133,9 @@ CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "payments_bookingId_key" ON "payments"("bookingId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "payments_userId_key" ON "payments"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "payments_transactionId_key" ON "payments"("transactionId");
@@ -153,10 +171,16 @@ ALTER TABLE "bookings" ADD CONSTRAINT "bookings_serviceId_fkey" FOREIGN KEY ("se
 ALTER TABLE "payments" ADD CONSTRAINT "payments_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "bookings"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "payments" ADD CONSTRAINT "payments_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "reviews" ADD CONSTRAINT "reviews_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "bookings"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "reviews" ADD CONSTRAINT "reviews_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "reviews" ADD CONSTRAINT "reviews_technicianId_fkey" FOREIGN KEY ("technicianId") REFERENCES "technician_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "services" ADD CONSTRAINT "services_technicianProfileId_fkey" FOREIGN KEY ("technicianProfileId") REFERENCES "technician_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;

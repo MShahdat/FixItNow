@@ -1,18 +1,17 @@
-
-
 model Services {
   id String @id @default(uuid())
 
   technicianProfileId String
-  technician TechnicianProfile @relation(fields:[technicianProfileId],references:[id], onDelete: Cascade)
-  categoryId String 
-  category Category @relation(fields:[categoryId],references:[id], onDelete: Cascade)
-  
-  title String
+  technician          TechnicianProfile @relation(fields: [technicianProfileId], references: [id], onDelete: Cascade)
+  categoryId          String
+  category            Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  title       String
   description String
-  price Int
-  duration String
+  price       Decimal @db.Decimal(10, 2)
+  duration    String
   availableAt String[]
+  isActive    Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

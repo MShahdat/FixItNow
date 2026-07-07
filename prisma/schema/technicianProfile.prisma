@@ -1,22 +1,25 @@
-
-
 model TechnicianProfile {
-  id                  String @id @default(uuid())
-  
-  userId              String @unique
-  user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  bio                 String?
-  experience          String?
-  workingHours        String[]
-  availability        Boolean @default(true)
-  verified            Boolean @default(false)
+  id String @id @default(uuid())
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bio            String?
+  skills         String[]
+  experience     String?
+  hourlyRate     Decimal @db.Decimal(10, 2)
+  avgRating      Decimal @default(0.0)
+  completedJobs  Int     @default(0)
+  isAvailable    Boolean  @default(true)
+  availability   String[]
+  isVerified     Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   services Services[]
   bookings Booking[]
+  reviews Review[]
 
   @@index([userId])
   @@map("technician_profiles")
