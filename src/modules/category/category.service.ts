@@ -43,6 +43,14 @@ const getAllCategoryFromDB = async (query: Query) => {
   const limit = Number(query.limit || 15)
 
   const category = await prisma.category.findMany({
+    include: {
+      services: true,
+      _count: {
+        select: {
+          services: true
+        }
+      }
+    },
     take: limit,
     skip: (page - 1) * limit
   })

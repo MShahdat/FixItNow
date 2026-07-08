@@ -51,9 +51,9 @@ CREATE TABLE "payments" (
     "userId" TEXT NOT NULL,
     "transactionId" TEXT NOT NULL,
     "paymentIntentId" TEXT NOT NULL,
-    "amount" INTEGER NOT NULL,
+    "amount" DECIMAL(10,2) NOT NULL,
     "status" "PaymentStatus" NOT NULL,
-    "paidAt" TIMESTAMP(3),
+    "paidAt" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
@@ -81,8 +81,11 @@ CREATE TABLE "services" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "price" DECIMAL(10,2) NOT NULL,
+    "type" TEXT NOT NULL,
     "duration" TEXT NOT NULL,
+    "location" TEXT[],
     "availableAt" TEXT[],
+    "rating" DECIMAL(3,2) NOT NULL DEFAULT 0,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -96,10 +99,10 @@ CREATE TABLE "technician_profiles" (
     "userId" TEXT NOT NULL,
     "bio" TEXT,
     "skills" TEXT[],
-    "experience" TEXT,
-    "hourlyRate" DECIMAL(10,2),
-    "avgRating" DECIMAL(65,30) DEFAULT 0.0,
-    "compoletedJobs" INTEGER DEFAULT 0,
+    "experience" INTEGER,
+    "hourlyRate" DECIMAL(10,2) NOT NULL DEFAULT 0,
+    "avgRating" DECIMAL(3,2) NOT NULL DEFAULT 0,
+    "completedJobs" INTEGER NOT NULL DEFAULT 0,
     "isAvailable" BOOLEAN NOT NULL DEFAULT true,
     "availability" TEXT[],
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
@@ -129,13 +132,19 @@ CREATE TABLE "users" (
 );
 
 -- CreateIndex
+CREATE INDEX "bookings_customerId_idx" ON "bookings"("customerId");
+
+-- CreateIndex
+CREATE INDEX "bookings_technicianId_idx" ON "bookings"("technicianId");
+
+-- CreateIndex
+CREATE INDEX "bookings_serviceId_idx" ON "bookings"("serviceId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "payments_bookingId_key" ON "payments"("bookingId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "payments_userId_key" ON "payments"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "payments_transactionId_key" ON "payments"("transactionId");
@@ -144,7 +153,28 @@ CREATE UNIQUE INDEX "payments_transactionId_key" ON "payments"("transactionId");
 CREATE UNIQUE INDEX "payments_paymentIntentId_key" ON "payments"("paymentIntentId");
 
 -- CreateIndex
+CREATE INDEX "payments_bookingId_idx" ON "payments"("bookingId");
+
+-- CreateIndex
+CREATE INDEX "payments_userId_idx" ON "payments"("userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "reviews_bookingId_key" ON "reviews"("bookingId");
+
+-- CreateIndex
+CREATE INDEX "reviews_bookingId_idx" ON "reviews"("bookingId");
+
+-- CreateIndex
+CREATE INDEX "reviews_customerId_idx" ON "reviews"("customerId");
+
+-- CreateIndex
+CREATE INDEX "reviews_technicianId_idx" ON "reviews"("technicianId");
+
+-- CreateIndex
+CREATE INDEX "services_technicianProfileId_idx" ON "services"("technicianProfileId");
+
+-- CreateIndex
+CREATE INDEX "services_categoryId_idx" ON "services"("categoryId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "technician_profiles_userId_key" ON "technician_profiles"("userId");

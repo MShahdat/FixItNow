@@ -4,6 +4,8 @@ import { serviceService } from "./service.service"
 import { notFoundResponse, successResponse } from "../../utility/sendResponse"
 import httpCode from 'http-status'
 
+
+//& CREATE SERVICES
 const createService = catchAsync(
   async(req: Request, res: Response) => {
     const body = req.body
@@ -19,7 +21,23 @@ const createService = catchAsync(
 )
 
 
+//& GET ALL SERVICES
+const getAllServices = catchAsync(
+  async(req: Request, res: Response) => {
+    
+    const result = await serviceService.allServicesFromDB(req.query)
+    if(result.services.length === 0){
+      return notFoundResponse(res, 'sercices not found')
+    }
+    return successResponse(res, httpCode.OK, 'Services retrive successfully', result.services, result.meta)
+  }
+)
+
+
+
+
 export const serviceController = {
   createService,
+  getAllServices,
 
 }

@@ -9,8 +9,11 @@ model Services {
   title       String
   description String
   price       Decimal  @db.Decimal(10, 2)
+  type        String
   duration    String
+  location    String[]
   availableAt String[]
+  rating      Decimal @db.Decimal(3, 2) @default(0)
   isActive    Boolean  @default(true)
 
   createdAt DateTime @default(now())

@@ -8,6 +8,6 @@ const route = Router()
 
 
 route.post('/', authorization.roleAuth(Role.TECHNICIAN), serviceController.createService)
-
+route.get('/', serviceController.getAllServices)
 
 export const serviceRouter = route

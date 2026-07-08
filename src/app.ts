@@ -9,6 +9,7 @@ import { userRouter } from './modules/user/user.route';
 import { notFound } from './middleware/notFound';
 import { categoryController } from './modules/category/category.controller';
 import { categoryRouter } from './modules/category/category.route';
+import { technicianRouter } from './modules/technicial/technician.route';
 
 const app: Application = express();
 
@@ -36,6 +37,8 @@ app.use('/api/auth', authRouter)
 app.use('/api/users', userRouter)
 
 
+//& technician
+app.use('/api/technicians', technicianRouter)
 
 
 //& categorie
