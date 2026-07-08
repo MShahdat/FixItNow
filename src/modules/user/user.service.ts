@@ -5,7 +5,7 @@ import { prisma } from "../../lib/prisma"
 import { IUserPass, IUserUpdate } from "./user.interface";
 import bcrypt from 'bcrypt'
 
-//^ USER REGISTER
+//^ GET USER
 const getProfileFromDB = async (role: Role, id: string) => {
 
   const query: Prisma.UserFindUniqueArgs = {
@@ -26,7 +26,6 @@ const getProfileFromDB = async (role: Role, id: string) => {
   const result = await prisma.user.findUnique(query);
   return result
 }
-
 
 
 //^ USER UPDATE

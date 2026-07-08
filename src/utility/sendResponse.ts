@@ -13,12 +13,13 @@ export const rootResponse = (res: Response) => {
 }
 
 //* SUCCESS
-export const successResponse = <T> (res: Response, statusCode: number, message?: string, data?: T) => {
+export const successResponse = <T, M> (res: Response, statusCode: number, message?: string, data?: T, meta?: M) => {
   const response = {
     success: true,
     statusCode,
     message: message || "Request completed successfully",
-    data
+    data,
+    meta
   }
   res.status(httpCode.OK).json(response)
 }
