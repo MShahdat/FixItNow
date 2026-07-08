@@ -5,6 +5,24 @@ import { badResponse, errorResponse, notFoundResponse, successResponse } from ".
 import httpCode from 'http-status'
 
 
+//& get all users
+const getAll = catchAsync(
+  async(req: Request, res: Response) => {
+
+    if(!req.user){
+      return notFoundResponse(res, 'User not found')
+    }
+    const result = await userService.getAllUsersFromDB(req.query);
+
+    if (!result.users.length) {
+      return notFoundResponse(res, "Users not found!")
+    }
+
+    return successResponse(res, httpCode.OK, 'All users retrive successfully', result.users, result.meta)
+  }
+)
+
+
 //^ PROFILE GET
 const getProfile = catchAsync(
   async (req: Request, res: Response) => {
@@ -63,6 +81,7 @@ const updatePass = catchAsync(
 )
 
 export const userController = {
+  getAll,
   getProfile,
   updateProfile,
   updatePass,

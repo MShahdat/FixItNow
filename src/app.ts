@@ -4,11 +4,11 @@ import { rootResponse } from './utility/sendResponse';
 import cookieParser from 'cookie-parser';
 import { authRouter } from './modules/auth/auth.route';
 import { serviceRouter } from './modules/service/service.route';
-import { categoryRouter } from './modules/category/category.route';
 import { globalError } from './middleware/globalError';
 import { userRouter } from './modules/user/user.route';
 import { notFound } from './middleware/notFound';
-import { adminRouter } from './modules/admin/admin.route';
+import { categoryController } from './modules/category/category.controller';
+import { categoryRouter } from './modules/category/category.route';
 
 const app: Application = express();
 
@@ -38,16 +38,13 @@ app.use('/api/users', userRouter)
 
 
 
-//& admin
-app.use('/api/admin', adminRouter)
-// app.use('/api/admin/categories', categoryRouter)
-
+//& categorie
+app.use('/api/categories', categoryRouter)
 
 
 
 //& service
 app.use('/api/services', serviceRouter)
-
 
 
 
