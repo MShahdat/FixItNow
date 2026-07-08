@@ -44,8 +44,27 @@ const getBooking = async(customerId: string) => {
  
   const bookings = await prisma.booking.findMany({
     where: { customerId },
+    // include: {
+    //   service: true
+    // },
+  })
+
+  return bookings
+
+}
+
+
+
+
+//& booking get for details
+const getBookingById = async(id: string) => {
+ 
+  const bookings = await prisma.booking.findMany({
+    where: { id },
     include: {
-      service: true
+      service: true,
+      payment: true,
+      review: true
     },
   })
 
@@ -54,8 +73,11 @@ const getBooking = async(customerId: string) => {
 }
 
 
+
+
 export const bookingService = {
   createBooking,
   getBooking,
+  getBookingById,
 
 }

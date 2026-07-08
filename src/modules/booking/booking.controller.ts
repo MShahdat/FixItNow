@@ -39,8 +39,25 @@ const getBooking = catchAsync(
 )
 
 
+
+//& get booking by id
+const getBookingById = catchAsync(
+  async(req: Request, res: Response) => {
+
+    const id = req.params.bookingId as string
+
+    const result = await bookingService.getBookingById(id)
+
+    if(result.length === 0){
+      return notFoundResponse(res, 'Booking is not found')
+    }
+    return successResponse(res, httpcode.CREATED, 'Booking created successfully', result)
+  }
+)
+
+
 export const bookingController = {
   createBooking,
   getBooking,
-
+  getBookingById
 }

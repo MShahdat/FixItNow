@@ -36,8 +36,42 @@ const getTechnicianById = catchAsync(
 )
 
 
+
+//& get booking 
+const getBooking = catchAsync(
+  async(req: Request, res: Response) => {
+
+    const userId = req.user?.id as string
+
+    const result = await technicianService.getBookingFromDB(userId)
+
+    if(result.length === 0){
+      return notFoundResponse(res, 'You are not booking services yet')
+    }
+    return successResponse(res, httpCode.OK, 'Booking retrived successfully', result)
+  }
+)
+
+
+//& update booking 
+const updateBooking = catchAsync(
+  async(req: Request, res: Response) => {
+
+    const id = req.params.bookingId as string
+    const body = req.body
+
+    const result = await technicianService.updateBookingFromDB(id, body)
+
+    return successResponse(res, httpCode.OK, 'Booking updated successfully', result)
+  }
+)
+
+
+
+
 export const technicianController = {
   getAllTechnician,
   getTechnicianById,
-
+  getBooking,
+  updateBooking,
 }

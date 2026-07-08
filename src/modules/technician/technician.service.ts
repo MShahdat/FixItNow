@@ -1,6 +1,7 @@
 import { Query } from "express-serve-static-core";
 import { Prisma, Role } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
+import { IBookingUpdate } from "./technician.interface";
 
 
 
@@ -139,8 +140,58 @@ const getTechnicianByIdFromDB = async (id: string) => {
   
 };
 
+
+//& get booking
+const getBookingFromDB = async(userId: string) => {
+ 
+  const techProfile = await prisma.technicianProfile.findUniqueOrThrow({
+    where: {userId}
+  })
+
+  const technicianId = techProfile?.id 
+
+  const bookings = await prisma.booking.findMany({
+    where: { technicianId },
+    include: {
+      service: true
+    },
+  })
+
+  return bookings
+
+}
+
+
+//& update booking
+const updateBookingFromDB = async(id: string, payload: IBookingUpdate) => {
+
+
+  const updateData = payload.status === 'ACCEPTED' ? 
+      {
+        status: payload.status,
+        acceptedAt: new Date(),
+        canceledAt: null,
+        cancelReason: null
+      } : {
+        status: payload.status,
+        canceledAt: new Date(),
+        cancelReason: payload.cancelReason,
+        acceptedAt: null
+      }
+
+
+  const updated = await prisma.booking.update({
+    where: {id},
+    data: updateData
+  })
+
+  return updated
+}
+
 export const technicianService = {
   getTechnicianFromDB,
   getTechnicianByIdFromDB,
+  getBookingFromDB,
+  updateBookingFromDB
 
 }
