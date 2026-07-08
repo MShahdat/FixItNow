@@ -22,3 +22,9 @@ export interface IUserUpdate {
 export interface IUserPass {
   password: string
 }
+
+
+export interface IUserStatus {
+  status: UserStatus
+}
+

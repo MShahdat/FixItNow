@@ -135,8 +135,16 @@ const allServicesFromDB = async (query: Query) => {
 }
 
 
+
+//& UPDATE SERVICE PROFILE
+const updateServiceIntoDB = async() => {
+
+
+}
+
 export const serviceService = {
   createServiceIntoDB,
   allServicesFromDB,
+  updateServiceIntoDB,
 
 }

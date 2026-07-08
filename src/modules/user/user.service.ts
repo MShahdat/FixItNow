@@ -3,7 +3,7 @@ import { Prisma } from "../../../generated/prisma/client";
 import { Role, UserStatus } from "../../../generated/prisma/enums"
 import config from "../../config/env";
 import { prisma } from "../../lib/prisma"
-import { IUserPass, IUserUpdate } from "./user.interface";
+import { IUserPass, IUserStatus, IUserUpdate } from "./user.interface";
 import bcrypt from 'bcrypt'
 
 
@@ -257,10 +257,40 @@ const updatePassIntoDB = async (id: string, payload: IUserPass) => {
 
 }
 
+
+//& update status 
+const updateStatusIntoDB = async(userId: string, payload: IUserStatus) => {
+  
+  console.log('user status ', payload)
+
+  const user = await prisma.user.findUnique({
+    where: {id: userId}
+  })
+
+  if(!user){
+    return 'not'
+  }
+
+  const updated = await prisma.user.update({
+    where: {
+      id: userId
+    },
+    data: {
+      status: payload.status
+    }
+  })
+
+  return updated
+}
+
+
+
+
 export const userService = {
   getAllUsersFromDB,
   getProfileFromDB,
   updateProfileIntoDB,
   updatePassIntoDB,
+  updateStatusIntoDB,
 
 }

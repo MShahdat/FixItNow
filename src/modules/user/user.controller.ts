@@ -3,15 +3,13 @@ import catchAsync from "../../utility/catchAsync";
 import { userService } from "./user.service";
 import { badResponse, errorResponse, notFoundResponse, successResponse } from "../../utility/sendResponse";
 import httpCode from 'http-status'
+import { Role } from "../../../generated/prisma/enums";
 
 
 //& get all users
 const getAll = catchAsync(
   async(req: Request, res: Response) => {
 
-    if(!req.user){
-      return notFoundResponse(res, 'User not found')
-    }
     const result = await userService.getAllUsersFromDB(req.query);
 
     if (!result.users.length) {
@@ -27,12 +25,8 @@ const getAll = catchAsync(
 const getProfile = catchAsync(
   async (req: Request, res: Response) => {
 
-    if (!req.user) {
-      return notFoundResponse(res, 'User not found!!')
-    }
-
     const id = req.user?.id as string
-    const role = req.user.role
+    const role = req.user?.role as Role
 
     const result = await userService.getProfileFromDB(role, id);
 
@@ -63,11 +57,7 @@ const updateProfile = catchAsync(
 const updatePass = catchAsync(
   async (req: Request, res: Response) => {
    
-    if (!req.user) {
-      return notFoundResponse(res, 'User not found!')
-    }
-
-    const id = req.user.id as string
+    const id = req.user?.id as string
     const body = req.body
 
     const result = await userService.updatePassIntoDB(id, body)
@@ -80,10 +70,30 @@ const updatePass = catchAsync(
   }
 )
 
+
+
+//& update status 
+const updateStatus = catchAsync(
+  async(req: Request, res: Response) => {
+    const id = req.params.userId as string
+    const body = req.body
+
+    const result = await userService.updateStatusIntoDB(id, body)
+    
+    if(result === 'not'){
+      return notFoundResponse(res, 'User not found')
+    }
+    return successResponse(res, httpCode.OK, 'User status updated successfully')
+  }
+)
+
+
+
 export const userController = {
   getAll,
   getProfile,
   updateProfile,
   updatePass,
+  updateStatus,
 
 }

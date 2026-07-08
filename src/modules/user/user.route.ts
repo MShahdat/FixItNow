@@ -11,6 +11,7 @@ route.get('/profile', authorization.roleAuth(Role.ADMIN, Role.CUSTOMER, Role.TEC
 route.put('/profile', authorization.roleAuth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN), userController.updateProfile)
 route.patch('/change-password', authorization.roleAuth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN), userController.updatePass)
 
+route.patch('/:userId', authorization.roleAuth(Role.ADMIN), userController.updateStatus)
 
 
 export const userRouter = route

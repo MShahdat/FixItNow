@@ -9,5 +9,8 @@ const route = Router()
 
 route.post('/', authorization.roleAuth(Role.TECHNICIAN), serviceController.createService)
 route.get('/', serviceController.getAllServices)
+// route.patch('/')
+
+
 
 export const serviceRouter = route

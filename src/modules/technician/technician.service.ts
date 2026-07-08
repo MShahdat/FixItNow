@@ -15,6 +15,11 @@ const getTechnicianFromDB = async (query: Query) => {
   const andConditions: Prisma.UserWhereInput[] = []
 
 
+  andConditions.push({
+    status: "ACTIVE"
+  })
+  
+  
   //! searching
   if (query.search) {
     andConditions.push({
@@ -70,6 +75,7 @@ if (query.minExperience || query.maxExperience) {
     }
   });
 }
+
   const users = await prisma.user.findMany({
     where: {
       AND: andConditions,
@@ -87,7 +93,12 @@ if (query.minExperience || query.maxExperience) {
       updatedAt: true,
     },
     include: {
-      technicianProfile: true,
+      technicianProfile: {
+        include: {
+          services: true,
+          reviews: true,
+        }
+      }
     },
   });
 
@@ -111,8 +122,25 @@ if (query.minExperience || query.maxExperience) {
 };
 
 
+//& GET TECHNICIAN BY ID
+const getTechnicianByIdFromDB = async (id: string) => {
+
+  const technician = await prisma.user.findUnique({
+    where: {id},
+    include: {
+      technicianProfile: {
+        include: {
+          reviews: true
+        }
+      }
+    }
+  })
+  return technician
+  
+};
 
 export const technicianService = {
   getTechnicianFromDB,
+  getTechnicianByIdFromDB,
 
 }

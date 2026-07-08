@@ -12,7 +12,8 @@ model Booking {
   address       String
   note          String?
   totalAmount   Decimal @db.Decimal(10, 2)
-  status        BookingStatus
+  status        BookingStatus @default(REQUESTED)
+  
   cancelReason String?
   acceptedAt DateTime?
   startedAt DateTime?

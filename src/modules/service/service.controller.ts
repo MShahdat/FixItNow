@@ -35,9 +35,17 @@ const getAllServices = catchAsync(
 
 
 
+//& UPDATE SERVICE PROFILE
+const updateService = catchAsync(
+  async(req: Request, res: Response) => {
+
+  }
+)
+
 
 export const serviceController = {
   createService,
   getAllServices,
-
+  updateService,
+  
 }
