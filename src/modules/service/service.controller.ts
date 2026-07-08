@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import catchAsync from "../../utility/catchAsync"
 import { serviceService } from "./service.service"
-import { notFoundResponse, successResponse } from "../../utility/sendResponse"
+import { notFoundResponse, successResponse, unauthorizedResponse } from "../../utility/sendResponse"
 import httpCode from 'http-status'
 
 
@@ -39,6 +39,20 @@ const getAllServices = catchAsync(
 const updateService = catchAsync(
   async(req: Request, res: Response) => {
 
+    const id = req.params.serviceId as string
+    const userId = req.user?.id as string
+    
+    const result = await serviceService.updateServiceIntoDB(id, userId, req.body)
+    
+    if(result === 'unauth'){
+      return unauthorizedResponse(res, 'unauthorized access')
+    }
+
+    if(!result){
+      return notFoundResponse(res, 'service not fouond!')
+    }
+
+    return successResponse(res, httpCode.OK, 'servcie updated successfully', result)
   }
 )
 

@@ -11,3 +11,16 @@ export interface IServicePayload {
   availableAt: string[]
 }
 
+
+
+
+export interface IServiceUpdate {
+  title?: string
+  description?: string
+  type?: string,
+  price?: number
+  location?: string[]
+  duration?: string
+  availableAt?: string[]
+}
+

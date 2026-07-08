@@ -34,7 +34,7 @@ const getBooking = catchAsync(
     if(result.length === 0){
       return notFoundResponse(res, 'You are not booking services yet')
     }
-    return successResponse(res, httpcode.CREATED, 'Booking created successfully', result)
+    return successResponse(res, httpcode.OK, 'Booking retrived successfully', result)
   }
 )
 

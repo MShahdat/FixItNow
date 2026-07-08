@@ -8,8 +8,8 @@ const route = Router()
 
 route.post('/', authorization.roleAuth(Role.CUSTOMER), bookingController.createBooking)
 route.get('/', authorization.roleAuth(Role.CUSTOMER), bookingController.getBooking)
-route.get('/:bookingId', authorization.roleAuth(Role.CUSTOMER, Role.TECHNICIAN, Role.ADMIN), bookingController.getBookingById)
 
+route.get('/:bookingId', authorization.roleAuth(Role.CUSTOMER, Role.TECHNICIAN, Role.ADMIN), bookingController.getBookingById)
 
 
 

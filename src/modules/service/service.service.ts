@@ -1,6 +1,6 @@
-import { Prisma } from "../../../generated/prisma/client";
+import { BookingStatus, Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma"
-import { IServicePayload } from "./service.interface"
+import { IServicePayload, IServiceUpdate } from "./service.interface"
 import { Query } from "express-serve-static-core";
 
 //& CREATE SERVICES INTO DB
@@ -85,15 +85,6 @@ const allServicesFromDB = async (query: Query) => {
     });
   }
 
-  if (query.minRating || query.maxRating) {
-    andConditions.push({
-      rating: {
-        ...(query.minRating && { gte: Number(query.minRating) }),
-        ...(query.maxRating && { lte: Number(query.maxRating) }),
-      },
-    });
-  }
-
   if (query.type) {
     andConditions.push({
       type: (query.type) as string
@@ -106,6 +97,19 @@ const allServicesFromDB = async (query: Query) => {
     where: {
       AND: andConditions
     },
+    include: {
+      review: {
+        omit: {
+          createdAt: true,
+          updatedAt: true,
+          customerId: true,
+          id: true,
+          serviceId: true,
+          technicianId: true,
+
+        }
+      }
+    },
     take: limit,
     skip: (page - 1) * limit,
 
@@ -117,7 +121,7 @@ const allServicesFromDB = async (query: Query) => {
   const total = await prisma.services.count({
     where: {
       AND: andConditions
-    }
+    },
   })
 
   const meta = {
@@ -137,10 +141,46 @@ const allServicesFromDB = async (query: Query) => {
 
 
 //& UPDATE SERVICE PROFILE
-const updateServiceIntoDB = async() => {
+const updateServiceIntoDB = async (id: string, userId: string,  payload: IServiceUpdate) => {
 
+  const service = await prisma.services.findUnique({
+    where: { id }
+  })
+
+  if (!service) {
+    return null
+  }
+
+  console.log('service',service)
+  const pId = service.technicianProfileId
+
+
+  const profile = await prisma.technicianProfile.findUnique({
+    where: {userId}
+  })
+
+  if(pId !== profile?.id){
+    return 'unauth'
+  }
+
+  const hasPendingRequest = await prisma.booking.findFirst({
+    where: { serviceId: id, status: "REQUESTED" },
+  });
+
+  if(hasPendingRequest){
+    throw new Error("Cannot update service while there are pending booking requests")
+  }
+
+  const updated = await prisma.services.update({
+    where: {id}, 
+    data: payload
+  })
+
+  return updated
 
 }
+
+
 
 export const serviceService = {
   createServiceIntoDB,

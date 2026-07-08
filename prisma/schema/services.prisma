@@ -13,16 +13,15 @@ model Services {
   duration    String
   location    String[]
   availableAt String[]
-  rating      Decimal @db.Decimal(3, 2) @default(0)
   isActive    Boolean  @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  review   Review[]
   bookings Booking[]
 
   @@index([technicianProfileId])
   @@index([categoryId])
-
   @@map("services")
 }

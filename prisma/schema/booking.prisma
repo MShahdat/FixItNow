@@ -24,7 +24,6 @@ model Booking {
   updatedAt DateTime @updatedAt
 
   payment Payment?
-  review  Review?
 
   @@index([customerId])
   @@index([technicianId])

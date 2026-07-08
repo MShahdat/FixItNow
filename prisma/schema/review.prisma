@@ -1,25 +1,21 @@
-
-
-
 model Review {
-  id         String  @id @default(uuid())
+  id String @id @default(uuid())
 
-  bookingId  String  @unique
-  booking    Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  customerId String 
-  customer   User    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  serviceId    String        
+  service      Services          @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  customerId   String
+  customer     User              @relation(fields: [customerId], references: [id], onDelete: Cascade)
   technicianId String
-  technician   TechnicianProfile    @relation(fields: [technicianId], references: [id], onDelete: Cascade)
-  
-  rating     Decimal @db.Decimal(2, 1)
+  technician   TechnicianProfile @relation(fields: [technicianId], references: [id], onDelete: Cascade)
+
+  rating  Decimal @db.Decimal(2, 1)
   comment String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([bookingId])
   @@index([customerId])
   @@index([technicianId])
-
+  @@index([serviceId])
   @@map("reviews")
 }

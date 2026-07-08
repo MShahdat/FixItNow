@@ -11,6 +11,7 @@ import { categoryController } from './modules/category/category.controller';
 import { categoryRouter } from './modules/category/category.route';
 import { technicianRouter } from './modules/technician/technician.route';
 import { bookingRouter } from './modules/booking/booking.route';
+import { reviewRouter } from './modules/review/review.route';
 
 const app: Application = express();
 
@@ -55,6 +56,13 @@ app.use('/api/services', serviceRouter)
 
 //& booking
 app.use('/api/booking', bookingRouter)
+
+
+
+
+//& reviews
+app.use('/api/reviews', reviewRouter)
+
 
 
 app.use(notFound)

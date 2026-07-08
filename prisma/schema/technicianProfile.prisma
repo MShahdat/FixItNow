@@ -8,7 +8,6 @@ model TechnicianProfile {
   skills         String[]
   experience     Int?
   hourlyRate     Decimal @db.Decimal(10,2) @default(0)
-  avgRating      Decimal @db.Decimal(3,2) @default(0)
   completedJobs  Int     @default(0)
   isAvailable    Boolean  @default(true)
   availability   String[]
