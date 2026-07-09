@@ -12,6 +12,7 @@ import { categoryRouter } from './modules/category/category.route';
 import { technicianRouter } from './modules/technician/technician.route';
 import { bookingRouter } from './modules/booking/booking.route';
 import { reviewRouter } from './modules/review/review.route';
+import { paymentRouter } from './modules/payment/payment.route';
 
 const app: Application = express();
 
@@ -64,6 +65,8 @@ app.use('/api/booking', bookingRouter)
 app.use('/api/reviews', reviewRouter)
 
 
+//& payment
+app.use('/api/payments', paymentRouter)
 
 app.use(notFound)
 app.use(globalError)

@@ -71,6 +71,7 @@ export const badResponse = (res: Response, message: string) => {
 }
 
 
+//& error response
 export const errorResponse = <T> (res: Response, message?: string, data?: T) => {
   const response = {
     success: false,
