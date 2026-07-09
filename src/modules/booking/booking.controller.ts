@@ -77,5 +77,7 @@ const trackBooking = catchAsync(
 export const bookingController = {
   createBooking,
   getBooking,
-  getBookingById
+  getBookingById,
+  trackBooking,
+  
 }

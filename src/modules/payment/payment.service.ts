@@ -25,7 +25,7 @@ const createCheckoutSession = async (userId: string, payload: IPayment) => {
     throw new Error("Already paid");
   }
 
-  if(booking.status === 'COMPLETED'){
+  if (booking.status === 'COMPLETED') {
     throw new Error("Job already completed")
   }
 
@@ -78,7 +78,7 @@ const paymentWebhook = async (signature: string, payload: Buffer) => {
   switch (event.type) {
     case "checkout.session.completed":
       console.log('seccess...')
-      await paymentSuccess( event.data.object as Stripe.Checkout.Session );
+      await paymentSuccess(event.data.object as Stripe.Checkout.Session);
       break;
 
     default:
@@ -88,7 +88,52 @@ const paymentWebhook = async (signature: string, payload: Buffer) => {
 
 
 
+//& payment history
+const payHisoty = async (userId: string) => {
+
+  const history = await prisma.payment.findMany({
+    where: { userId },
+    select: {
+      amount: true,
+      status: true,
+      transactionId: true,
+      paidAt: true,
+      booking: {
+        select: {
+          service: {
+            select: {
+              title: true,
+              technician: {
+                select: {
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                    },
+                  },
+                },
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+
+  return history.map((his) => ({
+    serviceName: his.booking.service.title,
+    technicianName: `${his.booking.service.technician.user.firstName} ${his.booking.service.technician.user.lastName ?? ""}`.trim(),
+    amount: Number(his.amount),
+    status: his.status,
+    transactionId: his.transactionId,
+    paidAt: his.paidAt,
+  }));
+}
+
+
 export const paymentService = {
   createCheckoutSession,
-  paymentWebhook
+  paymentWebhook,
+  payHisoty,
+
 }

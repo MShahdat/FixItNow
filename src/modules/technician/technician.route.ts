@@ -13,7 +13,7 @@ route.get('/:technicianId', technicianController.getTechnicianById)
 
 route.patch('/booking/:bookingId', authorization.roleAuth(Role.TECHNICIAN), technicianController.updateBooking)
 
-
+route.get('/bookings/incomming', authorization.roleAuth(Role.TECHNICIAN), technicianController.incommingbook)
 
 
 

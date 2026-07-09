@@ -68,10 +68,24 @@ const updateBooking = catchAsync(
 
 
 
+//* view incoming booking
+const incommingbook = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = req.user?.id as string
+
+    const result = await technicianService.incommigBooking(id)
+    if(!result){
+      return notFoundResponse(res, 'no requested booking')
+    }
+    return successResponse(res, httpCode.OK, 'new booking retrive successfully', result)
+  }
+)
+
 
 export const technicianController = {
   getAllTechnician,
   getTechnicianById,
   getBooking,
   updateBooking,
+  incommingbook,
 }

@@ -19,8 +19,8 @@ const getTechnicianFromDB = async (query: Query) => {
   andConditions.push({
     status: "ACTIVE"
   })
-  
-  
+
+
   //! searching
   if (query.search) {
     andConditions.push({
@@ -66,16 +66,16 @@ const getTechnicianFromDB = async (query: Query) => {
     })
   }
 
-if (query.minExperience || query.maxExperience) {
-  andConditions.push({
-    technicianProfile: {
-      experience: {
-      ...(query.minExperience && { gte: Number(query.minExperience) }),
-      ...(query.maxExperience && { lte: Number(query.maxExperience) }),
-    },
-    }
-  });
-}
+  if (query.minExperience || query.maxExperience) {
+    andConditions.push({
+      technicianProfile: {
+        experience: {
+          ...(query.minExperience && { gte: Number(query.minExperience) }),
+          ...(query.maxExperience && { lte: Number(query.maxExperience) }),
+        },
+      }
+    });
+  }
 
   const users = await prisma.user.findMany({
     where: {
@@ -127,7 +127,7 @@ if (query.minExperience || query.maxExperience) {
 const getTechnicianByIdFromDB = async (id: string) => {
 
   const technician = await prisma.user.findUnique({
-    where: {id},
+    where: { id },
     include: {
       technicianProfile: {
         include: {
@@ -137,18 +137,18 @@ const getTechnicianByIdFromDB = async (id: string) => {
     }
   })
   return technician
-  
+
 };
 
 
 //& get booking
-const getBookingFromDB = async(userId: string) => {
- 
+const getBookingFromDB = async (userId: string) => {
+
   const techProfile = await prisma.technicianProfile.findUniqueOrThrow({
-    where: {userId}
+    where: { userId }
   })
 
-  const technicianId = techProfile?.id 
+  const technicianId = techProfile?.id
 
   const bookings = await prisma.booking.findMany({
     where: { technicianId },
@@ -163,35 +163,70 @@ const getBookingFromDB = async(userId: string) => {
 
 
 //& update booking
-const updateBookingFromDB = async(id: string, payload: IBookingUpdate) => {
+const updateBookingFromDB = async (id: string, payload: IBookingUpdate) => {
 
 
-  const updateData = payload.status === 'ACCEPTED' ? 
-      {
-        status: payload.status,
-        acceptedAt: new Date(),
-        canceledAt: null,
-        cancelReason: null
-      } : {
-        status: payload.status,
-        canceledAt: new Date(),
-        cancelReason: payload.cancelReason,
-        acceptedAt: null
-      }
+  const updateData = payload.status === 'ACCEPTED' ?
+    {
+      status: payload.status,
+      acceptedAt: new Date(),
+      canceledAt: null,
+      cancelReason: null
+    } : {
+      status: payload.status,
+      canceledAt: new Date(),
+      cancelReason: payload.cancelReason,
+      acceptedAt: null
+    }
 
 
   const updated = await prisma.booking.update({
-    where: {id},
+    where: { id },
     data: updateData
   })
 
   return updated
 }
 
+
+
+//* view incoming booking
+const incommigBooking = async (id: string) => {
+
+  const booking = await prisma.booking.findMany({
+    where: {
+      technicianId: id,
+      status: "REQUESTED"
+    },
+    include: {
+      service: true,
+      technician: {
+        include: {
+          user: true
+        }
+      }
+    }
+  })
+
+  return booking.map((book) => ({
+    bookingId: book.id,
+    customerName: `${book.technician.user.firstName} ${book.technician.user.lastName ?? ""}`.trim(),
+    serviceName: book.service.title,
+    scheduledDate: book.scheduledDate,
+    address: book.address,
+    note: book.note,
+    totalAmount: Number(book.totalAmount),
+    status: book.status,
+    createdAt: book.createdAt,
+  }));
+}
+
+
 export const technicianService = {
   getTechnicianFromDB,
   getTechnicianByIdFromDB,
   getBookingFromDB,
-  updateBookingFromDB
+  updateBookingFromDB,
+  incommigBooking,
 
 }

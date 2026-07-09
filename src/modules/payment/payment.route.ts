@@ -10,6 +10,6 @@ route.post( "/create-checkout-session", authorization.roleAuth(Role.CUSTOMER), p
 
 route.post("/webhook", paymentController.stripeWebhook);
 
-
+route.get('/history', authorization.roleAuth(Role.CUSTOMER), paymentController.history)
 
 export const paymentRouter = route

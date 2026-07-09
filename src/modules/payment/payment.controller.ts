@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import catchAsync from "../../utility/catchAsync";
 import { paymentService } from "./payment.service";
-import {successResponse } from "../../utility/sendResponse";
+import {notFoundResponse, successResponse } from "../../utility/sendResponse";
 import httpCode from 'http-status'
 
 
@@ -41,8 +41,23 @@ const stripeWebhook = catchAsync(
 
 
 
+//& payment history
+const history = catchAsync(
+  async(req: Request, res: Response) => {
+    const userId = req.user?.id as string
+
+    const result = await paymentService.payHisoty(userId)
+
+    if(!result){
+      return notFoundResponse(res, 'you are not payment yet')
+    }
+    return successResponse(res, httpCode.OK, 'my history retrive successfully', result)
+  }
+)
+
 export const paymentController = {
   createCheckoutSession,
   stripeWebhook,
+  history,
 
 }

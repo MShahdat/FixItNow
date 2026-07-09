@@ -60,7 +60,7 @@ app.use('/api/services', serviceRouter)
 
 
 //& booking
-app.use('/api/booking', bookingRouter)
+app.use('/api/bookings', bookingRouter)
 
 
 //& reviews

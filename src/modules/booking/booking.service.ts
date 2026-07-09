@@ -4,9 +4,9 @@ import { IBooking } from "./booking.interface"
 
 
 //& booking create
-const createBooking = async(customerId: string, payload: IBooking) => {
+const createBooking = async (customerId: string, payload: IBooking) => {
   console.log(payload)
-  const {serviceId} = payload
+  const { serviceId } = payload
 
 
   const isService = await prisma.services.findUnique({
@@ -14,11 +14,11 @@ const createBooking = async(customerId: string, payload: IBooking) => {
       id: serviceId,
       isActive: true
     }
-  }) 
+  })
 
-  console.log('service ' , isService)
-  if(!isService){
-     return 'not service'
+  console.log('service ', isService)
+  if (!isService) {
+    return 'not service'
   }
 
   const technicianId = isService.technicianProfileId
@@ -40,25 +40,46 @@ const createBooking = async(customerId: string, payload: IBooking) => {
 
 
 //& booking get
-const getBooking = async(customerId: string) => {
- 
+const getBooking = async (customerId: string) => {
   const bookings = await prisma.booking.findMany({
     where: { customerId },
-    // include: {
-    //   service: true
-    // },
+    select: {
+      id: true,
+      scheduledDate: true,
+      status: true,
+      totalAmount: true,
+      service: {
+        select: {
+          title: true,
+        },
+      },
+      technician: {
+        select: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            }
+          }
+        }
+      }
+    }
   })
 
-  return bookings
-
-}
-
-
+  return bookings.map((booking) => ({
+    id: booking.id,
+    serviceTitle: booking.service.title,
+    technicianName: `${booking.technician.user.firstName} ${booking.technician.user.lastName ?? ""}`.trim(),
+    scheduledDate: booking.scheduledDate,
+    status: booking.status,
+    totalAmount: Number(booking.totalAmount),
+  }));
+};
 
 
 //& booking get for details
-const getBookingById = async(id: string) => {
- 
+const getBookingById = async (id: string) => {
+
   const bookings = await prisma.booking.findMany({
     where: { id },
     include: {
