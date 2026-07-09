@@ -28,6 +28,7 @@ app.use(express.json());
 app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(req.url, '=====', Date.now())
   next()
@@ -62,13 +63,16 @@ app.use('/api/services', serviceRouter)
 app.use('/api/booking', bookingRouter)
 
 
-
 //& reviews
 app.use('/api/reviews', reviewRouter)
 
 
 //& payment
 app.use('/api/payments', paymentRouter)
+
+
+
+
 
 app.use(notFound)
 app.use(globalError)

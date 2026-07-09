@@ -11,6 +11,7 @@ route.get('/', authorization.roleAuth(Role.CUSTOMER), bookingController.getBooki
 
 route.get('/:bookingId', authorization.roleAuth(Role.CUSTOMER, Role.TECHNICIAN, Role.ADMIN), bookingController.getBookingById)
 
+route.get('/staus', authorization.roleAuth(Role.CUSTOMER))
 
 
 export const bookingRouter = route

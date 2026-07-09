@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { paymentController } from "./payment.controller";
 import { authorization } from "../../middleware/auth";
 import { Role } from "../../../generated/prisma/enums";
-
-
+import { paymentController } from "./payment.controller";
 
 const route = Router()
 
-route.post('/create-payment-intent',authorization.roleAuth(Role.CUSTOMER), paymentController.createPaymentIntent)
+route.post( "/create-checkout-session", authorization.roleAuth(Role.CUSTOMER), paymentController.createCheckoutSession
+);
 
-route.post('/webhook', paymentController.stripeWebhook)
+route.post("/webhook", paymentController.stripeWebhook);
+
 
 
 export const paymentRouter = route

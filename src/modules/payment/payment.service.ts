@@ -1,61 +1,94 @@
+import Stripe from "stripe";
+import config from "../../config/env";
 import { prisma } from "../../lib/prisma";
 import { stripe } from "../../lib/stripe";
 import { IPayment } from "./payment.interface";
+import { paymentSuccess } from "./payment.utility";
 
 
 
-//& create payment intent
-const createPayIntent = async (userId: string, payload: IPayment) => {
-  
-  const {bookingId} = payload
+//& create checkout session
+const createCheckoutSession = async (userId: string, payload: IPayment) => {
+  const { bookingId } = payload;
 
-  const booking = await prisma.booking.findUnique({
+  const booking = await prisma.booking.findUniqueOrThrow({
     where: {
-      id: bookingId
-    }
+      id: bookingId,
+    },
   });
 
-  if(!booking){
-    throw new Error("Booking not found")
+  if (booking.customerId !== userId) {
+    throw new Error("Unauthorized access");
   }
 
-  if(booking.customerId !== userId){
-    throw new Error("Unauthorized access!!")
+  if (booking.status === "PAID") {
+    throw new Error("Already paid");
   }
 
-  // if(booking.status === 'PAID'){
-  //   throw new Error("You already paid")
-  // }
-
-  if(booking.status !== 'ACCEPTED'){
-    throw new Error("Booking is not accepted yet")
+  if(booking.status === 'COMPLETED'){
+    throw new Error("Job already completed")
   }
 
-  const paid = await prisma.payment.findUnique({
-    where: {bookingId}
-  })
-
-  if(paid){
-    throw new Error("You alrady paid")
+  if (booking.status !== "ACCEPTED") {
+    throw new Error("Booking is not accepted");
   }
 
-
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: Number(booking.totalAmount) * 100,
-    currency: 'bdt',
+  const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: "bdt",
+          unit_amount: Number(booking.totalAmount) * 100,
+          product_data: {
+            name: `Booking #${booking.id}`,
+            description: "FixItNow Service Booking"
+          }
+        }
+      }
+    ],
+    mode: "payment",
+    payment_method_types: ["card"],
+    success_url: `${config.app_url}/payment/success`,
+    cancel_url: `${config.app_url}/payment/cancel`,
     metadata: {
       bookingId: booking.id,
       customerId: booking.customerId
-    },
-  })
+    }
+  });
 
   return {
-    clientSecret: paymentIntent.client_secret
+    paymentUrl: session.url
+  };
+
+};
+
+
+// //& payment webhook
+const paymentWebhook = async (signature: string, payload: Buffer) => {
+
+  const endpointSecret = config.stripe_webhook_secret;
+
+  const event = stripe.webhooks.constructEvent(
+    payload,
+    signature,
+    endpointSecret
+  );
+
+  switch (event.type) {
+    case "checkout.session.completed":
+      console.log('seccess...')
+      await paymentSuccess( event.data.object as Stripe.Checkout.Session );
+      break;
+
+    default:
+      console.log("Unhandled Event");
   }
-}
+};
+
 
 
 export const paymentService = {
-  createPayIntent,
-  
+  createCheckoutSession,
+  paymentWebhook
 }
