@@ -21,6 +21,9 @@ app.get('/', (req: Request, res: Response)=> {
 })
 
 
+app.use('/api/payments/webhook', express.raw({type: "application/json"}))
+
+
 app.use(express.json());
 app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
@@ -57,7 +60,6 @@ app.use('/api/services', serviceRouter)
 
 //& booking
 app.use('/api/booking', bookingRouter)
-
 
 
 

@@ -8,7 +8,7 @@ import { IPayment } from "./payment.interface";
 const createPayIntent = async (userId: string, payload: IPayment) => {
   
   const {bookingId} = payload
-  
+
   const booking = await prisma.booking.findUnique({
     where: {
       id: bookingId
@@ -46,7 +46,7 @@ const createPayIntent = async (userId: string, payload: IPayment) => {
     metadata: {
       bookingId: booking.id,
       customerId: booking.customerId
-    }
+    },
   })
 
   return {
