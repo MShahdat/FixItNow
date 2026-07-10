@@ -143,8 +143,6 @@ const cancleBookingFromDB = async (userId: string, bookingId: string, payload: a
 }
 
 
-
-
 export const bookingService = {
   createBooking,
   getBooking,

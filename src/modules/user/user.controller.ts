@@ -6,20 +6,6 @@ import httpCode from 'http-status'
 import { Role } from "../../../generated/prisma/enums";
 
 
-//& get all users
-const getAll = catchAsync(
-  async(req: Request, res: Response) => {
-
-    const result = await userService.getAllUsersFromDB(req.query);
-
-    if (!result.users.length) {
-      return notFoundResponse(res, "Users not found!")
-    }
-
-    return successResponse(res, httpCode.OK, 'All users retrive successfully', result.users, result.meta)
-  }
-)
-
 
 //^ PROFILE GET
 const getProfile = catchAsync(
@@ -71,29 +57,21 @@ const updatePass = catchAsync(
 )
 
 
-
-//& update status 
-const updateStatus = catchAsync(
+//& DELTE USER
+const deleteUser = catchAsync(
   async(req: Request, res: Response) => {
-    const id = req.params.userId as string
-    const body = req.body
+    const id = req.user?.id as string
 
-    const result = await userService.updateStatusIntoDB(id, body)
-    
-    if(result === 'not'){
-      return notFoundResponse(res, 'User not found')
-    }
-    return successResponse(res, httpCode.OK, 'User status updated successfully')
+    await userService.deleteProfileFromDB(id)
+    return successResponse(res, httpCode.OK, 'user deleted successfully')
   }
 )
 
 
-
 export const userController = {
-  getAll,
   getProfile,
   updateProfile,
   updatePass,
-  updateStatus,
-
+  deleteUser,
+  
 }

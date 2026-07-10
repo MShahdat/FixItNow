@@ -57,22 +57,6 @@ const getBookingById = catchAsync(
 
 
 
-//& track booking
-const trackBooking = catchAsync(
-  async(req: Request, res: Response) => {
-
-    const customerId = req.user?.id as string
-
-    const result = await bookingService.getBooking(customerId)
-
-    if(result.length === 0){
-      return notFoundResponse(res, 'You are not booking services yet')
-    }
-    return successResponse(res, httpcode.OK, 'Booking retrived successfully', result)
-  }
-)
-
-
 
 //& cancle booking
 const cancleBooking = catchAsync(
@@ -97,7 +81,6 @@ export const bookingController = {
   createBooking,
   getBooking,
   getBookingById,
-  trackBooking,
   cancleBooking,
   
 }

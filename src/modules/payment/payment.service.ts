@@ -4,6 +4,7 @@ import { prisma } from "../../lib/prisma";
 import { stripe } from "../../lib/stripe";
 import { IPayment } from "./payment.interface";
 import { paymentSuccess } from "./payment.utility";
+import { BookingStatus } from "../../../generated/prisma/enums";
 
 
 
@@ -94,15 +95,18 @@ const payHisoty = async (userId: string) => {
   const history = await prisma.payment.findMany({
     where: { userId },
     select: {
+      bookingId: true,
       amount: true,
       status: true,
       transactionId: true,
+      paymentIntentId: true,
       paidAt: true,
       booking: {
         select: {
           service: {
             select: {
               title: true,
+              type: true,
               technician: {
                 select: {
                   user: {
@@ -114,18 +118,21 @@ const payHisoty = async (userId: string) => {
                 },
               }
             }
-          }
+          },
         }
-      }
+      },
     }
   })
 
   return history.map((his) => ({
-    serviceName: his.booking.service.title,
+    bookingId: his.bookingId,
     technicianName: `${his.booking.service.technician.user.firstName} ${his.booking.service.technician.user.lastName ?? ""}`.trim(),
+    serviceTitle: his.booking.service.title,
+    serviceType: his.booking.service.type,
     amount: Number(his.amount),
     status: his.status,
     transactionId: his.transactionId,
+    paymentIntentId: his.paymentIntentId,
     paidAt: his.paidAt,
   }));
 }

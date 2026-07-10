@@ -7,11 +7,11 @@ import { Role } from "../../../generated/prisma/enums";
 const route = Router()
 
 route.post('/', authorization.roleAuth(Role.CUSTOMER), bookingController.createBooking)
+
 route.get('/my-bookings', authorization.roleAuth(Role.CUSTOMER), bookingController.getBooking)
 
 route.get('/:bookingId', authorization.roleAuth(Role.CUSTOMER, Role.TECHNICIAN, Role.ADMIN), bookingController.getBookingById)
 
-route.get('/staus', authorization.roleAuth(Role.CUSTOMER))
 route.patch('/cancel/:bookingId', authorization.roleAuth(Role.CUSTOMER), bookingController.cancleBooking)
 
 export const bookingRouter = route

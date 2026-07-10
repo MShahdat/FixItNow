@@ -13,6 +13,7 @@ import { technicianRouter } from './modules/technician/technician.route';
 import { bookingRouter } from './modules/booking/booking.route';
 import { reviewRouter } from './modules/review/review.route';
 import { paymentRouter } from './modules/payment/payment.route';
+import { adminRouter } from './modules/admin/admin.route';
 
 const app: Application = express();
 
@@ -39,6 +40,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use('/api/auth', authRouter)
 
 
+//& admin
+app.use('/api/admin', adminRouter)
 
 //& users
 app.use('/api/users', userRouter)
@@ -47,7 +50,6 @@ app.use('/api/users', userRouter)
 
 //& technician
 app.use('/api/technicians', technicianRouter)
-
 
 
 //& categorie

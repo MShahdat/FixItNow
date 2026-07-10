@@ -7,7 +7,7 @@ import { IReviewCreate } from "./review.interface"
 //& create review
 const createReviewIntoDB = async (customerId: string, payload: IReviewCreate) => {
 
- const { bookingId} = payload;
+ const { bookingId, rating, comment} = payload;
 
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
@@ -39,9 +39,11 @@ const createReviewIntoDB = async (customerId: string, payload: IReviewCreate) =>
 
   const review = await prisma.review.create({
     data: {
-      ...payload,
-      customerId,
-      technicianId
+      serviceId: booking.serviceId,
+      customerId: booking.customerId,
+      technicianId,
+      rating,
+      comment
     }
   })
   return review

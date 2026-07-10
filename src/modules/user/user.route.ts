@@ -6,12 +6,15 @@ import { Role } from "../../../generated/prisma/enums"
 
 
 const route = Router()
-route.get('/', authorization.roleAuth(Role.ADMIN), userController.getAll)
-route.get('/profile', authorization.roleAuth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN), userController.getProfile)
-route.put('/profile', authorization.roleAuth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN), userController.updateProfile)
-route.patch('/change-password', authorization.roleAuth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN), userController.updatePass)
+route.get('/profile', authorization.roleAuth(Role.CUSTOMER, Role.TECHNICIAN), userController.getProfile)
 
-route.patch('/:userId', authorization.roleAuth(Role.ADMIN), userController.updateStatus)
+route.put('/profile', authorization.roleAuth(Role.CUSTOMER, Role.TECHNICIAN), userController.updateProfile)
+
+route.patch('/change-password', authorization.roleAuth(Role.CUSTOMER, Role.TECHNICIAN), userController.updatePass)
+
+route.delete('/delete', authorization.roleAuth(Role.CUSTOMER, Role.TECHNICIAN), userController.deleteUser)
+
+
 
 
 export const userRouter = route

@@ -4,7 +4,7 @@ import { UserStatus } from "../../../generated/prisma/enums";
 export interface IUserUpdate {
     firstName?: string;
     lastName?: string;
-    phone: string;
+    phone?: string;
     profileImage?: string;
     address?: string;
     city?: string;
@@ -13,7 +13,6 @@ export interface IUserUpdate {
     skills?: string[];
     experience?: number | null;
     hourlyRate?: number
-    isAvailable?: boolean;
     availability?: string[];
 }
 
@@ -21,10 +20,5 @@ export interface IUserUpdate {
 
 export interface IUserPass {
   password: string
-}
-
-
-export interface IUserStatus {
-  status: UserStatus
 }
 
