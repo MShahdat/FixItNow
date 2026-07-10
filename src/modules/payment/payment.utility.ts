@@ -26,13 +26,16 @@ export const paymentSuccess = async (session: Stripe.Checkout.Session) => {
           },
         });
 
+        console.log('after payment ', payment)
+
         const bo = await tx.booking.update({
           where: { id: bookingId },
           data: {
-            status: BookingStatus.PAID,
-            completedAt: new Date(),
+            status: BookingStatus.IN_PROGRESS
           },
         });
+
+        console.log('after updated ', bo)
 
         return payment;
       },

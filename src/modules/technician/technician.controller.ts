@@ -46,7 +46,7 @@ const getBooking = catchAsync(
     const result = await technicianService.getBookingFromDB(userId)
 
     if(result.length === 0){
-      return notFoundResponse(res, 'You are not booking services yet')
+      return notFoundResponse(res, 'not booking found')
     }
     return successResponse(res, httpCode.OK, 'Booking retrived successfully', result)
   }
@@ -61,6 +61,10 @@ const updateBooking = catchAsync(
     const body = req.body
 
     const result = await technicianService.updateBookingFromDB(id, body)
+
+    if(!result){
+      return notFoundResponse(res, 'booking not found')
+    }
 
     return successResponse(res, httpCode.OK, 'Booking updated successfully', result)
   }
@@ -82,10 +86,23 @@ const incommingbook = catchAsync(
 )
 
 
+//& update availability
+const setAvailability = catchAsync(
+  async(req: Request, res: Response) => {
+    const id = req.user?.id as string
+    
+    const result = await technicianService.setAvailabilityIntoDB(id, req.body)
+    
+    return successResponse(res, httpCode.OK, 'updated availability time', result)
+  }
+)
+
 export const technicianController = {
   getAllTechnician,
   getTechnicianById,
   getBooking,
   updateBooking,
   incommingbook,
+  setAvailability,
+
 }

@@ -12,7 +12,9 @@ model Payment {
   status          PaymentStatus
   paidAt          DateTime
 
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([bookingId])
   @@index([userId])

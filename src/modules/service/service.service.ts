@@ -30,6 +30,7 @@ const createServiceIntoDB = async (userId: string, payload: IServicePayload) => 
   const service = await prisma.services.create({
     data: {
       ...payload,
+      type: cate.name,
       technicianProfileId: technicianProfile.id
     }
   })

@@ -1,3 +1,4 @@
+import { BookingStatus, PaymentStatus } from "../../../generated/prisma/enums"
 import { prisma } from "../../lib/prisma"
 import { IBooking } from "./booking.interface"
 
@@ -16,7 +17,6 @@ const createBooking = async (customerId: string, payload: IBooking) => {
     }
   })
 
-  console.log('service ', isService)
   if (!isService) {
     return 'not service'
   }
@@ -80,17 +80,66 @@ const getBooking = async (customerId: string) => {
 //& booking get for details
 const getBookingById = async (id: string) => {
 
-  const bookings = await prisma.booking.findMany({
+  const booking = await prisma.booking.findUnique({
     where: { id },
     include: {
       service: true,
       payment: true,
-      review: true
+      technician: true
     },
   })
 
-  return bookings
+  return booking
+}
 
+
+//& cancle booking
+const cancleBookingFromDB = async (userId: string, bookingId: string, payload: any) => {
+
+  const {cancelReason} = payload
+
+  const transectionResult = await prisma.$transaction(
+    async (tx) => {
+      const book = await tx.booking.findUnique({
+        where: {id: bookingId}
+      })
+
+      if(!book){
+        return null
+      }
+
+      if(book.status !== "IN_PROGRESS"){
+        throw new Error(`you can't cancel booking`)
+      }
+      
+      const updated = await tx.booking.update({
+        where: {
+          id: bookingId,
+          customerId: userId,
+        },
+        data: {
+          status: BookingStatus.CANCELLED,
+          cancelReason,
+          canceledAt: new Date(),
+        }
+      })
+
+      await tx.payment.update({
+        where: {bookingId},
+        data: {
+          status: PaymentStatus.REFUNDED
+        }
+      })
+
+      return updated
+    },
+    {
+      maxWait: 20000,
+      timeout: 20000
+    }
+  )
+
+  return transectionResult
 }
 
 
@@ -100,5 +149,6 @@ export const bookingService = {
   createBooking,
   getBooking,
   getBookingById,
+  cancleBookingFromDB,
 
 }

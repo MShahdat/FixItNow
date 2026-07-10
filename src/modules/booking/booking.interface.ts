@@ -18,3 +18,9 @@ export interface IBooking {
   canceledAt?: Date | null;
 
 }
+
+
+
+export interface IBookingCancle {
+  cancelReason: string
+}

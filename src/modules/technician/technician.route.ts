@@ -15,7 +15,7 @@ route.patch('/booking/:bookingId', authorization.roleAuth(Role.TECHNICIAN), tech
 
 route.get('/bookings/incomming', authorization.roleAuth(Role.TECHNICIAN), technicianController.incommingbook)
 
-
+route.patch('/availability', authorization.roleAuth(Role.TECHNICIAN), technicianController.setAvailability)
 
 
 

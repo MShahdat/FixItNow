@@ -1,7 +1,7 @@
 import { Query } from "express-serve-static-core";
 import { Prisma, Role } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
-import { IBookingUpdate } from "./technician.interface";
+import { IBookingUpdate, ISetAvailability } from "./technician.interface";
 
 
 
@@ -165,7 +165,6 @@ const getBookingFromDB = async (userId: string) => {
 //& update booking
 const updateBookingFromDB = async (id: string, payload: IBookingUpdate) => {
 
-
   const updateData = payload.status === 'ACCEPTED' ?
     {
       status: payload.status,
@@ -179,6 +178,13 @@ const updateBookingFromDB = async (id: string, payload: IBookingUpdate) => {
       acceptedAt: null
     }
 
+  const book = await prisma.booking.findUnique({
+    where: { id }
+  })
+
+  if(!book){
+    return null
+  }
 
   const updated = await prisma.booking.update({
     where: { id },
@@ -186,6 +192,7 @@ const updateBookingFromDB = async (id: string, payload: IBookingUpdate) => {
   })
 
   return updated
+
 }
 
 
@@ -222,11 +229,30 @@ const incommigBooking = async (id: string) => {
 }
 
 
+
+
+//& update availability 
+const setAvailabilityIntoDB = async (id: string, payload: ISetAvailability) => {
+
+  const {availability} = payload
+
+  const updated = await prisma.technicianProfile.update({
+    where: {userId: id
+    },
+    data: {
+      availability
+    }
+  })
+
+  return updated
+}
+
+
 export const technicianService = {
   getTechnicianFromDB,
   getTechnicianByIdFromDB,
   getBookingFromDB,
   updateBookingFromDB,
   incommigBooking,
-
+  setAvailabilityIntoDB
 }

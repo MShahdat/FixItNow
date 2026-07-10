@@ -21,7 +21,7 @@ const createCheckoutSession = async (userId: string, payload: IPayment) => {
     throw new Error("Unauthorized access");
   }
 
-  if (booking.status === "PAID") {
+  if (booking.status === "IN_PROGRESS") {
     throw new Error("Already paid");
   }
 

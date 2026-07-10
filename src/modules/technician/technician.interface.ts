@@ -6,3 +6,11 @@ export interface IBookingUpdate {
   status: "ACCEPTED" | "DECLINED"
   cancelReason?: string
 }
+
+
+
+export interface ISetAvailability {
+  availability: string[]
+}
+
+

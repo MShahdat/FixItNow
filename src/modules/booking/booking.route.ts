@@ -12,6 +12,6 @@ route.get('/my-bookings', authorization.roleAuth(Role.CUSTOMER), bookingControll
 route.get('/:bookingId', authorization.roleAuth(Role.CUSTOMER, Role.TECHNICIAN, Role.ADMIN), bookingController.getBookingById)
 
 route.get('/staus', authorization.roleAuth(Role.CUSTOMER))
-
+route.patch('/cancel/:bookingId', authorization.roleAuth(Role.CUSTOMER), bookingController.cancleBooking)
 
 export const bookingRouter = route
