@@ -21,6 +21,9 @@ const createReviewIntoDB = async (customerId: string, payload: IReviewCreate) =>
     throw new Error("You are not authorized to review this booking");
   }
 
+  if(booking.status === "ACCEPTED"){
+    throw new Error(`you did not pay yet. please pay first`)
+  }
 
   if (booking.status !== 'COMPLETED') {
     throw new Error('You are not aligeble for review!!')

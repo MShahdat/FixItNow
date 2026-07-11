@@ -1,10 +1,9 @@
 import { BookingStatus, Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma"
-import { IServicePayload, IServiceUpdate } from "./service.interface"
-import { Query } from "express-serve-static-core";
+import { IServiceCreate, IServiceUpdate, Query } from "./service.interface"
 
 //& CREATE SERVICES INTO DB
-const createServiceIntoDB = async (userId: string, payload: IServicePayload) => {
+const createServiceIntoDB = async (userId: string, payload: IServiceCreate) => {
   const { categoryId } = payload
 
   const cate = await prisma.category.findUnique({

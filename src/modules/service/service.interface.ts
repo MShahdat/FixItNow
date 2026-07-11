@@ -1,6 +1,7 @@
+import { ServicesWhereInput } from "../../../generated/prisma/models"
 
 
-export interface IServicePayload {
+export interface IServiceCreate {
   categoryId: string
   title: string
   description: string
@@ -23,3 +24,18 @@ export interface IServiceUpdate {
   availableAt?: string[]
 }
 
+
+
+export interface Query extends Omit<ServicesWhereInput, "location"> {
+  search?: string
+  sortOrder?: string
+  sortBy?: string
+  limit?: string
+  page?: string
+  type?: string
+  location?: string
+  minRating?: number
+  maxRating?: number
+  minPrice?: number
+  maxPrice?: number
+}

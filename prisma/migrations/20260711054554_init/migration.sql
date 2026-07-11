@@ -20,11 +20,9 @@ CREATE TABLE "bookings" (
     "address" TEXT NOT NULL,
     "note" TEXT,
     "totalAmount" DECIMAL(10,2) NOT NULL,
-    "status" "BookingStatus" NOT NULL,
+    "status" "BookingStatus" NOT NULL DEFAULT 'REQUESTED',
     "cancelReason" TEXT,
     "acceptedAt" TIMESTAMP(3),
-    "startedAt" TIMESTAMP(3),
-    "completedAt" TIMESTAMP(3),
     "canceledAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -55,6 +53,7 @@ CREATE TABLE "payments" (
     "status" "PaymentStatus" NOT NULL,
     "paidAt" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
 );
@@ -62,7 +61,7 @@ CREATE TABLE "payments" (
 -- CreateTable
 CREATE TABLE "reviews" (
     "id" TEXT NOT NULL,
-    "bookingId" TEXT NOT NULL,
+    "serviceId" TEXT NOT NULL,
     "customerId" TEXT NOT NULL,
     "technicianId" TEXT NOT NULL,
     "rating" DECIMAL(2,1) NOT NULL,
@@ -85,7 +84,6 @@ CREATE TABLE "services" (
     "duration" TEXT NOT NULL,
     "location" TEXT[],
     "availableAt" TEXT[],
-    "rating" DECIMAL(3,2) NOT NULL DEFAULT 0,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -101,9 +99,7 @@ CREATE TABLE "technician_profiles" (
     "skills" TEXT[],
     "experience" INTEGER,
     "hourlyRate" DECIMAL(10,2) NOT NULL DEFAULT 0,
-    "avgRating" DECIMAL(3,2) NOT NULL DEFAULT 0,
     "completedJobs" INTEGER NOT NULL DEFAULT 0,
-    "isAvailable" BOOLEAN NOT NULL DEFAULT true,
     "availability" TEXT[],
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -159,16 +155,13 @@ CREATE INDEX "payments_bookingId_idx" ON "payments"("bookingId");
 CREATE INDEX "payments_userId_idx" ON "payments"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "reviews_bookingId_key" ON "reviews"("bookingId");
-
--- CreateIndex
-CREATE INDEX "reviews_bookingId_idx" ON "reviews"("bookingId");
-
--- CreateIndex
 CREATE INDEX "reviews_customerId_idx" ON "reviews"("customerId");
 
 -- CreateIndex
 CREATE INDEX "reviews_technicianId_idx" ON "reviews"("technicianId");
+
+-- CreateIndex
+CREATE INDEX "reviews_serviceId_idx" ON "reviews"("serviceId");
 
 -- CreateIndex
 CREATE INDEX "services_technicianProfileId_idx" ON "services"("technicianProfileId");
@@ -204,7 +197,7 @@ ALTER TABLE "payments" ADD CONSTRAINT "payments_bookingId_fkey" FOREIGN KEY ("bo
 ALTER TABLE "payments" ADD CONSTRAINT "payments_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "reviews" ADD CONSTRAINT "reviews_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "bookings"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "reviews" ADD CONSTRAINT "reviews_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "services"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "reviews" ADD CONSTRAINT "reviews_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

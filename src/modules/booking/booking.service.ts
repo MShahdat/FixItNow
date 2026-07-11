@@ -1,4 +1,4 @@
-import { BookingStatus, PaymentStatus } from "../../../generated/prisma/enums"
+import { BookingStatus, PaymentStatus, UserStatus } from "../../../generated/prisma/enums"
 import { prisma } from "../../lib/prisma"
 import { IBooking } from "./booking.interface"
 
@@ -14,11 +14,20 @@ const createBooking = async (customerId: string, payload: IBooking) => {
     where: {
       id: serviceId,
       isActive: true
-    }
+    },
   })
 
   if (!isService) {
     return 'not service'
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {id: customerId}
+  })
+
+
+  if(user?.status === UserStatus.BLOCKED){
+    throw new Error('you are temporary BLOCKED now. please ACTIVE first then create booking')
   }
 
   const technicianId = isService.technicianProfileId

@@ -1,11 +1,16 @@
 import config from "../../config/env";
 import { prisma } from "../../lib/prisma";
-import { Prisma, Role } from "../../../generated/prisma/client";
+import { Prisma, Role, UserStatus } from "../../../generated/prisma/client";
 import { IUserLogin, IUserRegister } from "./auth.interface"
 import bcrypt from 'bcrypt'
 import { JwtPayload, SignOptions } from "jsonwebtoken";
 import { jwtToken } from "../../utility/jwt";
 import jwt from "jsonwebtoken";
+
+
+
+
+
 
 //& USER REGISTER
 const userRegisterIntoDB = async (payload: IUserRegister) => {
@@ -43,9 +48,7 @@ const userRegisterIntoDB = async (payload: IUserRegister) => {
     hourlyRate: payload.hourlyRate !== undefined
       ? new Prisma.Decimal(payload.hourlyRate)
       : new Prisma.Decimal(0),
-    availability: payload.availability ?? [],
-    isVerified: payload.verified ?? false,
-    isAvailable: payload.isAvailable ?? true,
+    availability: payload.availability ?? []
   }
 
   const transectionResult = await prisma.$transaction(
@@ -104,6 +107,7 @@ const userLoginFromDB = async (payload: IUserLogin) => {
   if (!user) {
     return null
   }
+
 
   const pass = user.password
   const isMatch = await bcrypt.compare(password, pass)

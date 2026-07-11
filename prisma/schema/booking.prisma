@@ -17,6 +17,7 @@ model Booking {
   cancelReason String?
   acceptedAt DateTime?
   canceledAt DateTime?
+  completedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

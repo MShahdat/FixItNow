@@ -1,7 +1,7 @@
-import { Query } from "express-serve-static-core";
-import { Prisma, Role } from "../../../generated/prisma/client";
+
+import { Prisma, Role, UserStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
-import { IBookingUpdate, ISetAvailability } from "./technician.interface";
+import { IBookingUpdate, ISetAvailability, Query } from "./technician.interface";
 
 
 
@@ -16,39 +16,12 @@ const getTechnicianFromDB = async (query: Query) => {
   const andConditions: Prisma.UserWhereInput[] = []
 
 
+  //! filtering
+
   andConditions.push({
-    status: "ACTIVE"
+    status: UserStatus.ACTIVE
   })
 
-
-  //! searching
-  if (query.search) {
-    andConditions.push({
-      OR: [
-        {
-          firstName: {
-            contains: query.search as string,
-            mode: "insensitive"
-          }
-        },
-        {
-          lastName: {
-            contains: query.search as string,
-            mode: 'insensitive'
-          }
-        },
-        {
-          phone: {
-            contains: query.search as string,
-            mode: "insensitive"
-          }
-        }
-      ]
-    })
-  }
-
-
-  //! filtering
   andConditions.push({
     role: Role.TECHNICIAN
   })
@@ -95,9 +68,11 @@ const getTechnicianFromDB = async (query: Query) => {
     },
     include: {
       technicianProfile: {
-        include: {
-          services: true,
-          reviews: true,
+        omit: {
+          id: true,
+          userId: true,
+          createdAt: true,
+          updatedAt: true
         }
       }
     },
@@ -128,16 +103,31 @@ const getTechnicianByIdFromDB = async (id: string) => {
 
   const technician = await prisma.user.findUnique({
     where: { id },
+    omit: {
+      password: true
+    },
     include: {
       technicianProfile: {
+        omit: {
+          id: true,
+          userId: true,
+          createdAt: true,
+          updatedAt: true
+        },
         include: {
-          reviews: true
+          reviews: {
+            omit: {
+              serviceId: true,
+              customerId: true,
+              technicianId: true,
+
+            }
+          }
         }
       }
     }
   })
   return technician
-
 };
 
 
@@ -162,38 +152,76 @@ const getBookingFromDB = async (userId: string) => {
 }
 
 
-//& update booking
-const updateBookingFromDB = async (id: string, payload: IBookingUpdate) => {
+//& update booking STATUS
+const updateBookingStatusFromDB = async (id: string, payload: IBookingUpdate) => {
 
-  const updateData = payload.status === 'ACCEPTED' ?
-    {
-      status: payload.status,
-      acceptedAt: new Date(),
-      canceledAt: null,
-      cancelReason: null
-    } : {
-      status: payload.status,
-      canceledAt: new Date(),
-      cancelReason: payload.cancelReason,
-      acceptedAt: null
-    }
+  const booking = await prisma.booking.findUnique({
+    where: { id },
+  });
 
-  const book = await prisma.booking.findUnique({
-    where: { id }
-  })
-
-  if(!book){
-    return null
+  if (!booking) {
+    return null;
   }
 
-  const updated = await prisma.booking.update({
-    where: { id },
-    data: updateData
-  })
+  let updateData = {};
 
-  return updated
+  if (
+    (booking.status === "REQUESTED" || booking.status === "DECLINED") && payload.status === "ACCEPTED") {
+    updateData = {
+      status: "ACCEPTED",
+      acceptedAt: new Date(),
+      canceledAt: null,
+      cancelReason: null,
+    };
+  }
 
-}
+  else if (
+    booking.status === "REQUESTED" && payload.status === "DECLINED") {
+    updateData = {
+      status: "DECLINED",
+      canceledAt: new Date(),
+      cancelReason: payload.cancelReason,
+    };
+  }
+
+  else if (booking.status === "IN_PROGRESS" && payload.status === "COMPLETED") {
+    updateData = {
+      status: "COMPLETED",
+      completedAt: new Date(),
+    };
+  }
+
+  else {
+    throw new Error(
+      `Invalid status transition: ${booking.status} -> ${payload.status}`
+    );
+  }
+
+  const transectionResult = await prisma.$transaction(
+    async (tx) => {
+    const bookingUpdated = await tx.booking.update({
+      where: { id },
+      data: updateData,
+    });
+
+    if (payload.status === "COMPLETED") {
+      await tx.technicianProfile.update({
+        where: {
+          id: booking.technicianId,
+        },
+        data: {
+          completedJobs: {
+            increment: 1,
+          },
+        },
+      });
+    }
+
+    return bookingUpdated;
+  });
+
+  return transectionResult;
+};
 
 
 
@@ -230,14 +258,14 @@ const incommigBooking = async (id: string) => {
 
 
 
-
 //& update availability 
 const setAvailabilityIntoDB = async (id: string, payload: ISetAvailability) => {
 
-  const {availability} = payload
+  const { availability } = payload
 
   const updated = await prisma.technicianProfile.update({
-    where: {userId: id
+    where: {
+      userId: id
     },
     data: {
       availability
@@ -252,7 +280,7 @@ export const technicianService = {
   getTechnicianFromDB,
   getTechnicianByIdFromDB,
   getBookingFromDB,
-  updateBookingFromDB,
+  updateBookingStatusFromDB,
   incommigBooking,
   setAvailabilityIntoDB
 }

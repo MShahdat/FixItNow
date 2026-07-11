@@ -18,9 +18,7 @@ export interface IUserRegister {
     hourlyRate?: number
     averageRating?: number;
     completedJobs?: number;
-    isAvailable?: boolean;
     availability?: string[];
-    verified?: boolean;
 }
 
 

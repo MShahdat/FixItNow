@@ -14,12 +14,12 @@ export interface Query extends UserWhereInput {
   sortBy?: string
   limit?: string
   page?: string
-  skill: string[]
-  status: UserStatus,
-  verify: boolean
-  role: Role,
-  minExperience: number,
-  maxExperience: number
+  skill?: string[]
+  status?: UserStatus,
+  verify?: boolean
+  role?: Role,
+  minExperience?: number,
+  maxExperience?: number
 }
 
 

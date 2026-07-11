@@ -21,7 +21,7 @@ export const paymentSuccess = async (session: Stripe.Checkout.Session) => {
             transactionId: paymentIntent.latest_charge as string,
             paymentIntentId: paymentIntent.id,
             amount: paymentIntent.amount / 100,
-            status: PaymentStatus.SUCCESS,
+            status: PaymentStatus.PAID,
             paidAt: new Date(),
           },
         });
