@@ -22,9 +22,14 @@ route.get('/users', authorization.roleAuth(Role.ADMIN), adminController.getAll)
 route.patch('/users/update-status/:userId', authorization.roleAuth(Role.ADMIN), adminController.updateStatus)
 
 
+route.post('/categories', authorization.roleAuth(Role.ADMIN), adminController.createCategory)
+
+
 route.get('/bookings', authorization.roleAuth(Role.ADMIN), adminController.getBooking)
 
-route.post('/categories', authorization.roleAuth(Role.ADMIN), adminController.createCategory)
+route.get('/bookings/:bookingId', authorization.roleAuth(Role.ADMIN), adminController.getBookingById)
+
+
 
 route.get('/categories', categoryController.getAllCategory)
 

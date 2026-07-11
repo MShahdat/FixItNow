@@ -138,9 +138,97 @@ const payHisoty = async (userId: string) => {
 }
 
 
+
+//& get payment by id
+const getPaymentFromDB = async (id: string, userId: string) => {
+
+  console.log('id', id)
+  console.log('user id', userId)
+
+  const result = await prisma.payment.findFirst({
+    where: {
+      id,
+      userId,
+    },
+    select: {
+      id: true,
+      transactionId: true,
+      paymentIntentId: true,
+      amount: true,
+      status: true,
+      paidAt: true,
+      booking: {
+        select: {
+          serviceId: true,
+          scheduledDate: true,
+          address: true,
+          status: true,
+          customer: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+              phone: true,
+              status: true,
+            },
+          },
+          service: {
+            select: {
+              title: true,
+              category: true,
+              duration: true,
+              review: {
+                select: {
+                  rating: true,
+                  comment: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!result) {
+    return null;
+  }
+
+  return {
+    id: result.id,
+    transactionId: result.transactionId,
+    paymentIntentId: result.paymentIntentId,
+    amount: result.amount,
+    paymentStatus: result.status,
+    paidAt: result.paidAt,
+
+    bookingStatus: result.booking.status,
+    scheduledDate: result.booking.scheduledDate,
+    address: result.booking.address,
+    serviceId: result.booking.serviceId,
+
+    customerName: `${result.booking.customer.firstName} ${result.booking.customer.lastName ?? ""}`.trim(),
+    customerEmail: result.booking.customer.email,
+    customerPhone: result.booking.customer.phone,
+    customerStatus: result.booking.customer.status,
+
+    serviceTitle: result.booking.service.title,
+    serviceCategory: result.booking.service.category,
+    serviceDuration: result.booking.service.duration,
+
+    rating: result.booking.service.review?.[0]?.rating ?? null,
+    comment: result.booking.service.review?.[0]?.comment ?? null,
+  };
+}
+
+
+
+
+
 export const paymentService = {
   createCheckoutSession,
   paymentWebhook,
   payHisoty,
+  getPaymentFromDB,
 
 }

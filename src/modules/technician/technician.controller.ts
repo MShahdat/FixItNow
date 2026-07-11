@@ -5,6 +5,7 @@ import { badResponse, errorResponse, notFoundResponse, successResponse } from ".
 import httpCode from 'http-status'
 import { Role } from "../../../generated/prisma/enums";
 import { userService } from "../user/user.service";
+import { bookingService } from "../booking/booking.service";
 
 
 
@@ -108,6 +109,21 @@ const getBooking = catchAsync(
   }
 )
 
+//& get booking by id
+const getBookingById = catchAsync(
+  async(req: Request, res: Response) => {
+
+    const id = req.params.bookingId as string
+
+    const result = await bookingService.getBookingById(id)
+
+    if(!result){
+      return notFoundResponse(res, 'Booking is not found')
+    }
+    return successResponse(res, httpCode.CREATED, 'Booking created successfully', result)
+  }
+)
+
 
 //& update booking 
 const updateBookingStatus = catchAsync(
@@ -166,5 +182,6 @@ export const technicianController = {
   updateBookingStatus,
   incommingbook,
   setAvailability,
-
+  getBookingById,
+  
 }

@@ -16,12 +16,14 @@ route.patch('/change-password', authorization.roleAuth(Role.TECHNICIAN), technic
 
 route.get('/', technicianController.getAllTechnician)
 
+route.get('/bookings', authorization.roleAuth(Role.TECHNICIAN), technicianController.getBooking)
+
 route.get('/:technicianId', technicianController.getTechnicianById)
 
 
-route.get('/booking', authorization.roleAuth(Role.TECHNICIAN), technicianController.getBooking)
+route.get('/bookings/:bookingId', authorization.roleAuth(Role.TECHNICIAN), technicianController.getBookingById)
 
-route.patch('/booking/:bookingId', authorization.roleAuth(Role.TECHNICIAN), technicianController.updateBookingStatus)
+route.patch('/bookings/:bookingId', authorization.roleAuth(Role.TECHNICIAN), technicianController.updateBookingStatus)
 
 route.get('/bookings/incomming', authorization.roleAuth(Role.TECHNICIAN), technicianController.incommingbook)
 

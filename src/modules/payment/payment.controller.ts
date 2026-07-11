@@ -55,9 +55,29 @@ const history = catchAsync(
   }
 )
 
+
+
+//& get payment by id
+const getPayment = catchAsync(
+  async(req: Request, res: Response) => {
+    const userId = req.user?.id as string
+    const id = req.params.paymentId as string
+
+    const result = await paymentService.getPaymentFromDB(id, userId)
+
+    if(!result){
+      return notFoundResponse(res, 'payment not found')
+    }
+    return successResponse(res, httpCode.OK, 'my history retrive successfully', result)
+  }
+)
+
+
+
 export const paymentController = {
   createCheckoutSession,
   stripeWebhook,
   history,
+  getPayment,
 
 }
