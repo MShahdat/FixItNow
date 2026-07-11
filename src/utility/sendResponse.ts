@@ -9,6 +9,7 @@ export const rootResponse = (res: Response) => {
     status: httpCode.OK,
     author: "Md. Shahdat Hossain",
     message: "Welcome to the FixItNow to your trusted home service platform",
+    description: "FixItNow is a backend API for a home services marketplace. Customers can browse available services (plumbing, electrical, cleaning, painting, etc.), book qualified technicians, and leave reviews. Technicians can create service profiles, manage their availability, and handle job bookings. Admins oversee the platform, manage users, and moderate service categories."
   });
 }
 

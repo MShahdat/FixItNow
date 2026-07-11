@@ -110,21 +110,6 @@ const updateCategoryById = catchAsync(
 
 
 
-//& DELETED CATEGORIES BY ID
-const deleteCategoryById = catchAsync(
-  async(req: Request, res: Response) => {
-    const categoryId = req.params.categoryId as string
-
-    const result = await adminService.deleteCategoriesByIdFromDB(categoryId)
-
-    if(result === 'not'){
-      return notFoundResponse(res, 'Category not found!!')
-    }
-    return successResponse(res, httpCode.OK, 'Category delted successfully', result)
-  }
-)
-
-
 //& payment history
 const paymentHistory = catchAsync(
   async(req: Request, res: Response) => {
@@ -146,7 +131,6 @@ export const adminController = {
   getBooking,
   createCategory,
   updateCategoryById,
-  deleteCategoryById,
   paymentHistory,
   getBookingById,
 

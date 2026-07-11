@@ -35,8 +35,6 @@ route.get('/categories', categoryController.getAllCategory)
 
 route.patch('/categories/:categoryId', authorization.roleAuth(Role.ADMIN), adminController.updateCategoryById)
 
-route.delete('/categories/:categoryId', authorization.roleAuth(Role.ADMIN), adminController.deleteCategoryById)
-
 
 route.get('/payment-history', authorization.roleAuth(Role.ADMIN), adminController.paymentHistory)
 

@@ -16,7 +16,6 @@ export interface Query extends UserWhereInput {
   page?: string
   skill?: string[]
   status?: UserStatus,
-  verify?: boolean
   role?: Role,
   minExperience?: number,
   maxExperience?: number

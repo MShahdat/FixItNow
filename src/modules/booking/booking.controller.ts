@@ -64,6 +64,9 @@ const cancleBooking = catchAsync(
     const customerId = req.user?.id as string
     const bookingId = req.params.bookingId as string
 
+    // console.log('user id', customerId);
+    // console.log('booking id', bookingId)
+
     const result = await bookingService.cancleBookingFromDB(customerId, bookingId, req.body)
 
     if(!result){

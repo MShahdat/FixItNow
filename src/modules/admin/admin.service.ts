@@ -68,13 +68,6 @@ const getAllUsersFromDB = async (query: Query) => {
     })
   }
 
-  if (query.verify) {
-    andConditions.push({
-      technicianProfile: {
-        isVerified: Boolean(query.verify)
-      }
-    })
-  }
 
   if (query.role) {
     andConditions.push({
@@ -137,7 +130,6 @@ const getAllUsersFromDB = async (query: Query) => {
           experience: true,
           hourlyRate: true,
           completedJobs: true,
-          isVerified: true,
         }
       },
     },
@@ -170,7 +162,6 @@ const getAllUsersFromDB = async (query: Query) => {
         experience: user.technicianProfile.experience,
         hourlyRate: user.technicianProfile.hourlyRate,
         completedJobs: user.technicianProfile.completedJobs,
-        isVerified: user.technicianProfile.isVerified,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       };
@@ -210,6 +201,9 @@ const updateStatusIntoDB = async (userId: string, payload: IUserStatus) => {
   const updated = await prisma.user.update({
     where: {
       id: userId
+    },
+    omit: {
+      password: true
     },
     data: {
       status: payload.status
@@ -310,22 +304,6 @@ const updateCategoriesByIdFromDB = async (categoryId: string, payload: ICategory
 
 
 
-//& DELETE CATEGORIES BY ID
-const deleteCategoriesByIdFromDB = async (categoryId: string) => {
-
-  const category = await prisma.category.findUnique({
-    where: { id: categoryId }
-  })
-  if (!category) {
-    return 'not'
-  }
-
-  await prisma.category.delete({
-    where: { id: categoryId }
-  })
-}
-
-
 
 //& payment history
 const paymentHisotyFromDB = async () => {
@@ -391,7 +369,6 @@ export const adminService = {
   getBookingFromDB,
   createCategoryIntoDB,
   updateCategoriesByIdFromDB,
-  deleteCategoriesByIdFromDB,
   paymentHisotyFromDB,
 
 }

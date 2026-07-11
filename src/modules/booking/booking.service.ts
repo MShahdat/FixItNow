@@ -116,6 +116,11 @@ const cancleBookingFromDB = async (userId: string, bookingId: string, payload: a
       if(!book){
         return null
       }
+      console.log('booking ', book)
+
+      if (book.customerId !== userId) {
+        return null
+      }
 
       if(book.status !== "IN_PROGRESS"){
         throw new Error(`you can't cancel booking`)
@@ -124,7 +129,6 @@ const cancleBookingFromDB = async (userId: string, bookingId: string, payload: a
       const updated = await tx.booking.update({
         where: {
           id: bookingId,
-          customerId: userId,
         },
         data: {
           status: BookingStatus.CANCELLED,
@@ -132,6 +136,8 @@ const cancleBookingFromDB = async (userId: string, bookingId: string, payload: a
           canceledAt: new Date(),
         }
       })
+
+      console.log('updated booking ', updated)
 
       await tx.payment.update({
         where: {bookingId},

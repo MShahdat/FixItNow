@@ -150,10 +150,10 @@ const incommingbook = catchAsync(
     const id = req.user?.id as string
 
     const result = await technicianService.incommigBooking(id)
-    if(!result){
+    if(result.length === 0){
       return notFoundResponse(res, 'no requested booking')
     }
-    return successResponse(res, httpCode.OK, 'new booking retrive successfully', result)
+    return successResponse(res, httpCode.OK, 'New booking retrive successfully', result)
   }
 )
 

@@ -228,9 +228,17 @@ const updateBookingStatusFromDB = async (id: string, payload: IBookingUpdate) =>
 //* view incoming booking
 const incommigBooking = async (id: string) => {
 
+  const tech = await prisma.technicianProfile.findUniqueOrThrow({
+    where: {
+      userId: id
+    }
+  })
+
+  // console.log('technician profile', tech)
+  
   const booking = await prisma.booking.findMany({
     where: {
-      technicianId: id,
+      technicianId: tech.id,
       status: "REQUESTED"
     },
     include: {
@@ -242,6 +250,8 @@ const incommigBooking = async (id: string) => {
       }
     }
   })
+
+  console.log('bookings ', booking)
 
   return booking.map((book) => ({
     bookingId: book.id,
